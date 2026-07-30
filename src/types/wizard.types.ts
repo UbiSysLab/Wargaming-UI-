@@ -1,6 +1,8 @@
 //A file containg types  related to app flow 
 
-
+import { LoginData } from '../features/login/login.types';
+import { NarrativeData } from '../features/narrative/narrative.types';
+import { OpOrderData } from '../features/opOrder/opOrder.types';
 export type WizardStep =
   | 'login'
   | 'openingNarrative'
@@ -15,11 +17,11 @@ export interface StepDefinition {
   label: string;
 }
 
-export const STEP_ORDER: StepDefinition[] = [
-  { id: 'login', order: 1, label: 'Login' },
-  { id: 'openingNarrative', order: 2, label: 'Opening Narrative / General Idea' },
-  { id: 'warningOrder', order: 3, label: 'Warning Order / Special Idea' },
-  { id: 'mapBrief', order: 4, label: 'Map Brief' },
-  { id: 'resourceOrbat', order: 5, label: 'Resource & ORBAT' },
-  { id: 'startPreparation', order: 6, label: 'Start Preperation' },
-];
+export interface WizardData {
+  login: LoginData | null;
+  openingNarrative: NarrativeData;
+  warningOrder: NarrativeData;
+  mapBrief: { notes: string };
+  resourceOrbat: { notes: string };
+  startPreparation: OpOrderData;
+}
