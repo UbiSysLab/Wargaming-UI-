@@ -1,6 +1,6 @@
 # Wargaming UI
 
-This project is a React + TypeScript app built with Vite. It includes a simple wizard-style UI and a step bar component.
+This project is a React + TypeScript app built with Vite. It includes a simple intial wizard-style UI . anyone can clone and interact with it .
 
 ## Run the UI locally
 
