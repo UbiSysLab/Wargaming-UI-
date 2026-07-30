@@ -1,16 +1,39 @@
-# React + Vite
+# Wargaming UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This project is a React + TypeScript app built with Vite. It includes a simple wizard-style UI and a step bar component.
 
-Currently, two official plugins are available:
+## Run the UI locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Open the local URL shown in the terminal (usually http://localhost:5173).
 
-## React Compiler
+## Build for production
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm run build
+```
 
-## Expanding the Oxlint configuration
+## Type checking
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+npm run typecheck
+```
+
+## Project structure
+
+- `src/app/` - app entry and top-level layout
+- `src/components/` - reusable UI pieces such as the step bar
+- `src/features/` - feature-specific panels and types
+- `src/stores/` - wizard state and context
+- `src/types/` - shared wizard type definitions
+
+## Notes
+
+This README is intended to help anyone clone the project and view the UI quickly without needing extra setup.
