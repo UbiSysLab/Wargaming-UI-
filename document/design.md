@@ -41,3 +41,6 @@ Build a small React + TypeScript UI app using Vite as the build tool.
 
 ## Why this design
 This app is intentionally simple so the TypeScript setup is the main learning focus. The design document is kept separate from implementation notes so the project remains easier to understand during early development.
+
+
+adding 
