@@ -1,0 +1,55 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 1.15rem;
+  background: #f5f8ff;
+  border: 1px solid #dce6f3;
+  border-radius: 24px;
+  box-shadow: 0 18px 35px rgba(15,23,42,0.06);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.stepLabel {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.stepTag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+@media (max-width: 1200px) {
+  .panel {
+    padding: 1rem;
+  }
+
+  .header {
+    gap: 0.65rem;
+  }
+}
