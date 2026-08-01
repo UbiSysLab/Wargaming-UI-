@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 0 12px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: #ffffff;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  border-right: 1px solid #e6e6e6;
+  margin-right: 16px;
+}
+
+.brandImg {
+  height: 56px;
+  width: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.actions > .iconButton {
+  flex: 0 0 calc(33.333% - 8px);
+  min-width: 120px;
+  padding: 6px 10px;
+  justify-content: center;
+}
+

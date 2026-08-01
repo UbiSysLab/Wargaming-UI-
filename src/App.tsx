@@ -2,6 +2,7 @@ import React from 'react';
 import { WizardProvider } from './stores/WizardContext';
 import { StepBar } from './components/StepBar';
 import { SidePanel } from './components/SidePanel';
+import MainToolbar from './components/MainToolbar';
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
         <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
           <main style={{ flex: 1, minHeight: 0, background: '#eef2ff', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <section style={{ flex: 1, minHeight: 0, borderRadius: '22px', background: '#ffffff', border: '1px solid #e5e7eb', boxShadow: '0 10px 24px rgba(15, 23, 42, 0.06)', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <MainToolbar />
               <div>
                 <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>Start Preparation</h1>
                 <p style={{ margin: '0.6rem 0 0', color: '#475569' }}>
@@ -24,7 +26,7 @@ export default function App() {
               </div>
             </div>
           </main>
-          <aside style={{ width: 420, minWidth: 420, borderLeft: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', minHeight: 0, padding: '1rem', background: 'transparent' }}>
+          <aside style={{ width: 380, minWidth: 380, borderLeft: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', minHeight: 0, padding: '1rem', background: 'transparent' }}>
             <SidePanel />
           </aside>
         </div>

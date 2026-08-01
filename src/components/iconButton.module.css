@@ -1,0 +1,29 @@
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e6e6e6);
+  cursor: pointer;
+  transition: box-shadow 0.12s ease;
+  justify-content: center;
+  min-width: 0;
+}
+.iconButton:focus {
+  outline: 2px solid var(--accent, #2563eb);
+  outline-offset: 2px;
+}
+.icon {
+  width: clamp(18px, 2vw, 28px);
+  height: clamp(18px, 2vw, 28px);
+  object-fit: contain;
+}
+.label {
+  font-size: 0.9rem;
+  color: var(--text, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -15,6 +15,8 @@ export function OpOrderPanel() {
     <div className={styles.panel}>
       <h2 className={styles.title}>Op ORDER (OPORD)</h2>
 
+      {/* Toolbar moved to main content area */}
+
       <div className={styles.grid}>
         <div className={styles.row}>
           <span className={styles.left}>REPORT NUMBER:</span>
@@ -63,7 +65,7 @@ export function OpOrderPanel() {
         <div className={styles.row}>
           <span className={styles.left}>MISSION:</span>
           <div className={styles.rightArea}>
-            <textarea className={styles.textarea} value={opOrder.mission} onChange={(e) => handleChange('mission', e.target.value)} />
+            <input className={styles.input} value={opOrder.mission} onChange={(e) => handleChange('mission', e.target.value)} />
           </div>
         </div>
 

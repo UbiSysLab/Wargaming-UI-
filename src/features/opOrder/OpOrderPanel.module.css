@@ -43,18 +43,15 @@
   background: #f4f4f5;
   border: 1px solid #ececee;
   border-radius: 6px;
-  padding: 0.5rem 0.65rem;
+  padding: 0.35rem 0.65rem;
   font-size: 0.85rem;
   color: #111827;
   font-family: inherit;
   width: 100%;
-  min-height: 32px;
+  min-height: 28px;
+  height: 28px;
   resize: none;
-}
-
-.input::placeholder,
-.textarea::placeholder {
-  color: #9ca3af;
+  overflow: hidden;
 }
 
 .grid {
@@ -83,7 +80,8 @@
 }
 
 .textareaLarge {
-  min-height: 140px;
+  min-height: 84px;
+  height: 84px;
 }
 
 .divider {
@@ -97,4 +95,12 @@
   outline: none;
   border-color: #93c5fd;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
 }
