@@ -2,23 +2,32 @@ import React from 'react';
 import IconButton from './IconButton';
 import styles from './mainToolbar.module.css';
 
-const loadPlan = new URL('../assets/Load-Plan.svg', import.meta.url).href;
-const brand = new URL('../assets/LAND-WARGAMING.svg', import.meta.url).href;
+const loadPlan = new URL('../assets/loadPlan.svg', import.meta.url).href;
+const uploadPlanAudio = new URL('../assets/uploadPlanAudio.svg', import.meta.url).href;
+const uploadPlanDocument = new URL('../assets/uploadPlanDocument.svg', import.meta.url).href;
+const recordAudio = new URL('../assets/recordAudio.svg', import.meta.url).href;
+const uploadPlanImage = new URL('../assets/uploadPlanImage.svg', import.meta.url).href;
+const createPlan = new URL('../assets/createPlan.svg', import.meta.url).href;
+const landWargaming = new URL('../assets/landwargaming.svg', import.meta.url).href;
 
-export default function MainToolbar() {
+type MainToolbarProps = {
+  onRecordAudioClick?: () => void;
+};
+
+export default function MainToolbar({ onRecordAudioClick }: MainToolbarProps) {
   return (
     <div className={styles.container}>
       <div className={styles.brand} aria-hidden="false">
-        <img src={brand} alt="Land Wargaming" className={styles.brandImg} />
+        <img src={landWargaming} alt="Land Wargaming" className={styles.brandImg} />
       </div>
 
       <div className={styles.actions} role="toolbar" aria-label="Main actions">
         <IconButton icon={loadPlan} label="Load Plan" />
-        <IconButton icon={loadPlan} label="Upload Plan Audio" />
-        <IconButton icon={loadPlan} label="Upload Plan Document" />
-        <IconButton icon={loadPlan} label="Record Audio" />
-        <IconButton icon={loadPlan} label="Upload Plan Image" />
-        <IconButton icon={loadPlan} label="Create Plan" />
+        <IconButton icon={uploadPlanAudio} label="Upload Plan Audio" />
+        <IconButton icon={uploadPlanDocument} label="Upload Plan Document" />
+        <IconButton icon={recordAudio} label="Record Audio" onClick={onRecordAudioClick} />
+        <IconButton icon={uploadPlanImage} label="Upload Plan Image" />
+        <IconButton icon={createPlan} label="Create Plan" />
       </div>
     </div>
   );
