@@ -21,9 +21,20 @@
   object-fit: contain;
 }
 .label {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--text, #111827);
-  white-space: nowrap;
+  line-height: 1.25;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: left;
+}
+.active {
+  background: #0060df !important;
+  border-color: #0056c6 !important;
+}
+.active .label {
+  color: #ffffff !important;
+}
+.active .icon {
+  filter: brightness(0) invert(1) !important;
 }

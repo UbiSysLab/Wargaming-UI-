@@ -12,9 +12,86 @@
 .title {
   font-size: 1.2rem;
   font-weight: 800;
+  margin-top: 0;
   margin-bottom: 1rem;
   letter-spacing: 0.01em;
   color: #0f172a;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Custom scrollbar track for clean visual design */
+.grid::-webkit-scrollbar {
+  width: 5px;
+}
+
+.grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 99px;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+.grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 32% 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.leftContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.left {
+  font-size: 0.72rem;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.activeLabel {
+  color: #0087e0;
+}
+
+.micIndicator {
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.micIndicator:hover {
+  opacity: 0.8;
+  transform: scale(1.15);
+}
+
+.micActive {
+  opacity: 1;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 2px rgba(0, 135, 224, 0.4));
+}
+
+.right, .rightArea {
+  width: 100%;
 }
 
 .input {
@@ -28,14 +105,7 @@
   font-family: inherit;
   width: 100%;
   height: 28px;
-}
-
-.right {
-  width: 100%;
-}
-
-.rightArea {
-  width: 100%;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .textarea {
@@ -48,59 +118,28 @@
   color: #111827;
   font-family: inherit;
   width: 100%;
-  min-height: 28px;
-  height: 28px;
   resize: none;
-  overflow: hidden;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  flex: 1 1 auto;
-  min-height: 0;
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 30% 1fr;
-  gap: 0.75rem;
-  align-items: start;
-}
-
-.left {
-  font-size: 0.72rem;
-  color: #475569;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.textareaLarge {
-  min-height: 84px;
-  height: 84px;
+/* Dictation active target is light mode (not dark) but gets active blue border indicator, matching user request */
+.dictationActive {
+  background-color: #f4f4f5 !important;
+  color: #111827 !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .divider {
   height: 1px;
   background: #e6e9ef;
   margin: 0.3rem 0;
-}
-
-.input:focus,
-.textarea:focus {
-  outline: none;
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-}
-
-.toolbar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }

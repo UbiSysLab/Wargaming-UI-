@@ -1,83 +1,117 @@
 import React from 'react';
 import { useWizard } from '../../stores/WizardContext';
 import { OpOrderData } from './opOrder.types';
+import { DictationTarget } from '../../types/wizard.types';
 import styles from './OpOrderPanel.module.css';
+
+interface FieldDefinition {
+  key: keyof OpOrderData;
+  label: string;
+  placeholder?: string;
+  type: 'input' | 'textarea';
+  isDictateable?: boolean;
+  height?: string;
+}
+
+const OPORD_FIELDS: FieldDefinition[] = [
+  { key: 'reportNumber', label: 'REPORT NUMBER:', type: 'input' },
+  { key: 'classification', label: 'CLASSIFICATION:', type: 'input' },
+  { key: 'dtg', label: 'DTG:', placeholder: 'Date & Time', type: 'input' },
+  { key: 'references', label: 'REFERENCES:', placeholder: 'Reference', type: 'input' },
+  { key: 'from', label: 'FROM:', type: 'input' },
+  { key: 'to', label: 'TO:', type: 'input' },
+  { key: 'mission', label: 'MISSION:', type: 'textarea', isDictateable: true, height: '48px' },
+  { key: 'execution', label: 'EXECUTION:', type: 'textarea', isDictateable: true, height: '140px' },
+];
 
 export function OpOrderPanel() {
   const { state, dispatch } = useWizard();
   const opOrder = state.data.startPreparation;
 
   const handleChange = (field: keyof OpOrderData, value: string) => {
-    dispatch({ type: 'UPDATE_STEP_DATA', payload: { step: 'startPreparation', data: { [field]: value } } });
+    dispatch({
+      type: 'UPDATE_STEP_DATA',
+      payload: { step: 'startPreparation', data: { [field]: value } },
+    });
+  };
+
+  const handleFieldSelect = (fieldKey: keyof OpOrderData, isDictateable?: boolean) => {
+    if (isDictateable) {
+      dispatch({
+        type: 'SET_DICTATION_TARGET',
+        payload: fieldKey as DictationTarget,
+      });
+    }
   };
 
   return (
     <div className={styles.panel}>
       <h2 className={styles.title}>Op ORDER (OPORD)</h2>
 
-      {/* Toolbar moved to main content area */}
-
+      {/* Grid container with downward scrollability (overflow-y: auto) */}
       <div className={styles.grid}>
-        <div className={styles.row}>
-          <span className={styles.left}>REPORT NUMBER:</span>
-          <div className={styles.right}>
-            <input className={styles.input} value={opOrder.reportNumber} onChange={(e) => handleChange('reportNumber', e.target.value)} />
-          </div>
-        </div>
+        {OPORD_FIELDS.map((field) => {
+          const isSelected = state.dictationTarget === field.key;
+          const isDictateable = field.isDictateable;
+          const showDividerBefore = field.key === 'mission';
 
-        <div className={styles.row}>
-          <span className={styles.left}>CLASSIFICATION:</span>
-          <div className={styles.right}>
-            <input className={styles.input} value={opOrder.classification} onChange={(e) => handleChange('classification', e.target.value)} />
-          </div>
-        </div>
+          return (
+            <React.Fragment key={field.key}>
+              {showDividerBefore && <div className={styles.divider} />}
+              
+              <div 
+                className={`${styles.row} ${isDictateable ? styles.dictateableRow : ''}`}
+                style={field.type === 'textarea' ? { display: 'flex', flexDirection: 'column', gap: '0.25rem' } : undefined}
+              >
+                <div className={styles.leftContainer}>
+                  <label 
+                    htmlFor={`opord-${field.key}`}
+                    className={`${styles.left} ${isSelected ? styles.activeLabel : ''}`}
+                  >
+                    {field.label}
+                  </label>
+                  {isDictateable && (
+                    <span 
+                      onClick={() => dispatch({ 
+                        type: 'SET_DICTATION_TARGET', 
+                        payload: isSelected ? 'none' : field.key as DictationTarget 
+                      })}
+                      className={`${styles.micIndicator} ${isSelected ? styles.micActive : ''}`}
+                      title={isSelected ? "Dictation active on this field. Click to disable." : "Click to dictate this field"}
+                    >
+                      🎙️
+                    </span>
+                  )}
+                </div>
 
-        <div className={styles.row}>
-          <span className={styles.left}>DTG:</span>
-          <div className={styles.right}>
-            <input className={styles.input} placeholder="Date & Time" value={opOrder.dtg} onChange={(e) => handleChange('dtg', e.target.value)} />
-          </div>
-        </div>
-
-        <div className={styles.row}>
-          <span className={styles.left}>REFERENCES:</span>
-          <div className={styles.right}>
-            <input className={styles.input} placeholder="Reference" value={opOrder.references} onChange={(e) => handleChange('references', e.target.value)} />
-          </div>
-        </div>
-
-        <div className={styles.row}>
-          <span className={styles.left}>FROM:</span>
-          <div className={styles.right}>
-            <input className={styles.input} value={opOrder.from} onChange={(e) => handleChange('from', e.target.value)} />
-          </div>
-        </div>
-
-        <div className={styles.row}>
-          <span className={styles.left}>TO:</span>
-          <div className={styles.right}>
-            <input className={styles.input} value={opOrder.to} onChange={(e) => handleChange('to', e.target.value)} />
-          </div>
-        </div>
-
-        <div className={styles.divider} />
-
-        <div className={styles.row}>
-          <span className={styles.left}>MISSION:</span>
-          <div className={styles.rightArea}>
-            <input className={styles.input} value={opOrder.mission} onChange={(e) => handleChange('mission', e.target.value)} />
-          </div>
-        </div>
-
-        <div className={styles.row}>
-          <span className={styles.left}>EXECUTION:</span>
-          <div className={styles.rightArea}>
-            <textarea className={`${styles.textarea} ${styles.textareaLarge}`} value={opOrder.execution} onChange={(e) => handleChange('execution', e.target.value)} />
-          </div>
-        </div>
+                <div className={field.type === 'textarea' ? styles.rightArea : styles.right}>
+                  {field.type === 'textarea' ? (
+                    <textarea
+                      id={`opord-${field.key}`}
+                      className={`${styles.textarea} ${isSelected ? styles.dictationActive : ''}`}
+                      style={field.height ? { height: field.height, minHeight: field.height } : undefined}
+                      value={opOrder[field.key]}
+                      onChange={(e) => handleChange(field.key, e.target.value)}
+                      onFocus={() => handleFieldSelect(field.key, isDictateable)}
+                      placeholder={field.placeholder || ''}
+                    />
+                  ) : (
+                    <input
+                      id={`opord-${field.key}`}
+                      type="text"
+                      className={`${styles.input} ${isSelected ? styles.dictationActive : ''}`}
+                      value={opOrder[field.key]}
+                      onChange={(e) => handleChange(field.key, e.target.value)}
+                      onFocus={() => handleFieldSelect(field.key, isDictateable)}
+                      placeholder={field.placeholder || ''}
+                    />
+                  )}
+                </div>
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
-
-      <div className={styles.divider} />
     </div>
   );
 }

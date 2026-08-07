@@ -31,10 +31,9 @@
   flex-wrap: wrap;
 }
 
-.actions > .iconButton {
+.actions > button {
   flex: 0 0 calc(33.333% - 8px);
   min-width: 120px;
   padding: 6px 10px;
   justify-content: center;
 }
-

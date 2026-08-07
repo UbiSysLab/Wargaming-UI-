@@ -8,6 +8,40 @@ export function StepBar() {
   const { state, dispatch } = useWizard();
   const currentStep: WizardStep = state.currentStep;
 
+  // Format step labels dynamically into two lines to match screenshots
+  const renderLabel = (label: string) => {
+    if (label.includes(' / ')) {
+      const parts = label.split(' / ');
+      return (
+        <>
+          {parts[0]} /
+          <br />
+          {parts[1]}
+        </>
+      );
+    }
+    if (label.includes(' & ')) {
+      const parts = label.split(' & ');
+      return (
+        <>
+          {parts[0]} &
+          <br />
+          {parts[1]}
+        </>
+      );
+    }
+    if (label === 'Start Preperation') {
+      return (
+        <>
+          Start
+          <br />
+          Preperation
+        </>
+      );
+    }
+    return label;
+  };
+
   return (
     <nav className={styles.stepBar} aria-label="Wizard steps" style={{ padding: '0.3rem 0.4rem' }}>
       {STEP_ORDER.map((step) => {
@@ -21,7 +55,9 @@ export function StepBar() {
             aria-current={isActive ? 'step' : undefined}
           >
             <span className={`${styles.oval} ${isActive ? styles.ovalActive : ''}`}>{step.order}</span>
-            <span className={`${styles.label} ${isActive ? styles.labelActive : ''}`}>{step.label}</span>
+            <span className={`${styles.label} ${isActive ? styles.labelActive : ''}`}>
+              {renderLabel(step.label)}
+            </span>
           </button>
         );
       })}

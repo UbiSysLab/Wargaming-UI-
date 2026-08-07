@@ -1,14 +1,16 @@
-import { WizardStep, WizardData } from '../types/wizard.types';
+import { WizardStep, WizardData, DictationTarget } from '../types/wizard.types';
 import { STEP_ORDER, initialWizardData } from './wizard.constants';
 
 export interface WizardState {
   currentStep: WizardStep;
   data: WizardData;
+  dictationTarget: DictationTarget;
 }
 
 export const initialWizardState: WizardState = {
   currentStep: 'startPreparation',
   data: initialWizardData,
+  dictationTarget: 'none',
 };
 
 /**
@@ -26,6 +28,7 @@ export type WizardAction =
       type: 'UPDATE_STEP_DATA';
       payload: { [K in WizardStep]: { step: K; data: Partial<WizardData[K]> } }[WizardStep];
     }
+  | { type: 'SET_DICTATION_TARGET'; payload: DictationTarget }
   | { type: 'RESTART' };
 
 function clampStepIndex(index: number): number {
@@ -52,6 +55,9 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       return { ...state, data: { ...state.data, [step]: { ...state.data[step], ...data } } };
     }
 
+    case 'SET_DICTATION_TARGET':
+      return { ...state, dictationTarget: action.payload };
+
     case 'RESTART':
       return initialWizardState;
 
@@ -65,4 +71,4 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       return state;
     }
   }
-}
+}

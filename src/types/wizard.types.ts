@@ -17,6 +17,8 @@ export interface StepDefinition {
   label: string;
 }
 
+export type DictationTarget = 'mission' | 'execution' | 'none';
+
 export interface WizardData {
   login: LoginData | null;
   openingNarrative: NarrativeData;
@@ -25,3 +27,4 @@ export interface WizardData {
   resourceOrbat: { notes: string };
   startPreparation: OpOrderData;
 }
+
