@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import WaveSurfer from 'wavesurfer.js';
-import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js';
+import React from 'react';
 import { useWizard } from '../../stores/WizardContext';
-import { transcribeAudio } from './transcribeApi';
+import { useAudioRecorder } from '../../hooks/useAudioRecorder';
+import { useAudioStreamer } from '../../hooks/useAudioStreamer';
+import { DictationTarget } from '../../types/wizard.types';
 import styles from './RecordAudioPanel.module.css';
 import tenMinutesBehiend from '../../assets/tenMinutesBehiend.svg';
 import tenMinutesAhead from '../../assets/tenMinutesAhead.svg';
@@ -16,196 +16,68 @@ interface RecordAudioPanelProps {
 
 export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
   const { state, dispatch } = useWizard();
-  const waveformRef = useRef<HTMLDivElement | null>(null);
-  const wsRef = useRef<WaveSurfer | null>(null);
-  const recordPluginRef = useRef<InstanceType<typeof RecordPlugin> | null>(null);
-  
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [hasAudio, setHasAudio] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [activeMode, setActiveMode] = React.useState<'single' | 'stream'>('stream');
 
-  // Use ref to store dictation target to avoid stale closure in wavesurfer callbacks
-  const dictationTargetRef = useRef(state.dictationTarget);
-  useEffect(() => {
-    dictationTargetRef.current = state.dictationTarget;
-  }, [state.dictationTarget]);
-
-  useEffect(() => {
-    if (!waveformRef.current) {
-      return undefined;
-    }
-
-    const recordPlugin = RecordPlugin.create({
-      mimeType: 'audio/webm',
-      audioBitsPerSecond: 128000,
-      mediaRecorderTimeslice: 1000,
-      renderRecordedAudio: true,
-      continuousWaveform: true,
-      scrollingWaveform: false,
+  // Success transcription dispatch handler passed to hooks
+  const handleTranscriptionSuccess = (target: DictationTarget, text: string) => {
+    const activeTarget = target === 'none' ? 'mission' : target;
+    dispatch({
+      type: 'UPDATE_STEP_DATA',
+      payload: {
+        step: 'startPreparation',
+        data: { [activeTarget]: text },
+      },
     });
+  };
 
-    const wavesurfer = WaveSurfer.create({
-      container: waveformRef.current,
-      backend: 'WebAudio',
-      height: 80,
-      waveColor: '#7f7f7f',
-      progressColor: '#2563eb',
-      cursorColor: '#2563eb',
-      cursorWidth: 0,
-      barWidth: 2,
-      barRadius: 2,
-      normalize: true,
-      plugins: [recordPlugin],
-    });
+  // 1. Classic WaveSurfer Recorder Hook
+  const {
+    waveformRef,
+    isRecording,
+    isPaused: isRecPaused,
+    isTranscribing,
+    hasAudio,
+    isPlaying,
+    error: recError,
+    startRecording,
+    stopRecording,
+    togglePauseRecording,
+    togglePlayPausePlayback,
+    stopPlayback,
+    discardAudio,
+    seekBackward,
+    seekForward,
+  } = useAudioRecorder(state.dictationTarget, handleTranscriptionSuccess);
 
-    wsRef.current = wavesurfer;
-    recordPluginRef.current = recordPlugin;
+  // 2. Real-time WebSocket Streaming Hook
+  const {
+    isStreaming,
+    isPaused: isStreamPaused,
+    isMuted,
+    audioLevel,
+    partialTranscript,
+    error: streamError,
+    startStreaming,
+    stopStreaming,
+    togglePauseStreaming,
+    toggleMuteStreaming,
+    clearTranscript,
+  } = useAudioStreamer(state.dictationTarget, handleTranscriptionSuccess);
 
-    // Listen to play/pause state of wavesurfer playback
-    const unsubPlay = wavesurfer.on('play', () => setIsPlaying(true));
-    const unsubPause = wavesurfer.on('pause', () => setIsPlaying(false));
-    const unsubFinish = wavesurfer.on('finish', () => setIsPlaying(false));
-
-    const onRecordStart = () => {
-      setError(undefined);
-      setIsRecording(true);
-      setIsPaused(false);
-      setHasAudio(false);
-      setIsPlaying(false);
-    };
-
-    const onRecordEnd = async (blob: Blob) => {
-      setIsRecording(false);
-      setIsPaused(false);
-      setIsTranscribing(true);
-      setError(undefined);
-
-      try {
-        // Load the recorded blob URL into wavesurfer for playback
-        const url = URL.createObjectURL(blob);
-        wavesurfer.load(url);
-        setHasAudio(true);
-
-        const result = await transcribeAudio(blob);
-        const text = result.text.trim();
-        
-        // Dispatch text to active target (mission / execution)
-        const target = dictationTargetRef.current === 'none' ? 'execution' : dictationTargetRef.current;
-        dispatch({
-          type: 'UPDATE_STEP_DATA',
-          payload: { step: 'startPreparation', data: { [target]: text } },
-        });
-      } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : 'Transcription failed.');
-      } finally {
-        setIsTranscribing(false);
-      }
-    };
-
-    const removeStart = recordPlugin.on('record-start', onRecordStart);
-    const removeEnd = recordPlugin.on('record-end', onRecordEnd);
-
-    return () => {
-      unsubPlay();
-      unsubPause();
-      unsubFinish();
-      removeStart();
-      removeEnd();
-      recordPlugin.destroy();
-      wavesurfer.destroy();
-    };
-  }, [dispatch]);
-
-  const handleToggleRecording = useCallback(async () => {
-    const plugin = recordPluginRef.current;
-    if (!plugin) {
-      return;
-    }
-
-    if (isRecording) {
-      plugin.stopRecording();
-      return;
-    }
-
-    try {
-      setError(undefined);
-      setHasAudio(false);
-      setIsPlaying(false);
-      await plugin.startRecording();
-    } catch (startError) {
-      setError(startError instanceof Error ? startError.message : 'Unable to start recording.');
-      setIsRecording(false);
-    }
-  }, [isRecording]);
-
-  const handlePauseToggle = useCallback(() => {
-    const plugin = recordPluginRef.current;
-    if (!plugin) return;
-    
-    if (plugin.isPaused()) {
-      plugin.resumeRecording();
-      setIsPaused(false);
+  // Stop current active sessions on mode change to prevent conflicts
+  React.useEffect(() => {
+    if (activeMode === 'single') {
+      stopStreaming();
     } else {
-      plugin.pauseRecording();
-      setIsPaused(true);
-    }
-  }, []);
-
-  // Playback Control Handlers
-  const handlePlayPause = useCallback(() => {
-    if (wsRef.current && hasAudio) {
-      if (wsRef.current.isPlaying()) {
-        wsRef.current.pause();
-      } else {
-        wsRef.current.play();
+      if (isRecording) {
+        stopRecording();
       }
     }
-  }, [hasAudio]);
+  }, [activeMode, isRecording, stopRecording, stopStreaming]);
 
-  const handleStopPlayback = useCallback(() => {
-    if (wsRef.current && hasAudio) {
-      wsRef.current.pause();
-      wsRef.current.setTime(0);
-    }
-  }, [hasAudio]);
-
-  const handleDiscardAudio = useCallback(() => {
-    if (wsRef.current) {
-      try {
-        wsRef.current.empty();
-      } catch (e) {
-        // Safe clear
-      }
-      setHasAudio(false);
-      setIsPlaying(false);
-    }
-  }, []);
-
-  const handleRewind = useCallback(() => {
-    if (wsRef.current) {
-      try {
-        const currentTime = wsRef.current.getCurrentTime();
-        wsRef.current.setTime(Math.max(0, currentTime - 10));
-      } catch (e) {
-        // Safe seek check
-      }
-    }
-  }, []);
-
-  const handleForward = useCallback(() => {
-    if (wsRef.current) {
-      try {
-        const currentTime = wsRef.current.getCurrentTime();
-        const duration = wsRef.current.getDuration();
-        wsRef.current.setTime(Math.min(duration || 0, currentTime + 10));
-      } catch (e) {
-        // Safe seek check
-      }
-    }
-  }, []);
+  React.useEffect(() => {
+    dispatch({ type: 'SET_TRANSCRIBING', payload: isTranscribing });
+  }, [isTranscribing, dispatch]);
 
   return (
     <section className={styles.panel} aria-label="Record audio panel" style={{ position: 'relative' }}>
@@ -220,112 +92,267 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
         </button>
       )}
 
-      <div className={styles.waveformCard}>
-        <div className={styles.waveformContainer}>
-          <div className={styles.waveformElement} ref={waveformRef} />
-          <div className={styles.waveformOverlay}>
-            <div className={styles.cursorLine} />
+      {/* Modern Tab Selector */}
+      <div className={styles.tabContainer}>
+        <button
+          type="button"
+          className={`${styles.tabButton} ${activeMode === 'stream' ? styles.tabActive : ''}`}
+          onClick={() => setActiveMode('stream')}
+        >
+          Live Streaming ASR
+        </button>
+        <button
+          type="button"
+          className={`${styles.tabButton} ${activeMode === 'single' ? styles.tabActive : ''}`}
+          onClick={() => setActiveMode('single')}
+        >
+          Single Record
+        </button>
+      </div>
+
+      {activeMode === 'stream' ? (
+        /* Real-Time WebSocket Streaming Mode */
+        <div className={styles.streamCard}>
+          <div className={styles.streamHeader}>
+            <div className={styles.streamStatus}>
+              {isStreaming ? (
+                <>
+                  <span className={`${styles.statusDot} ${isStreamPaused ? styles.dotPaused : styles.dotActive}`} />
+                  <span className={styles.statusText}>
+                    {isStreamPaused ? 'STREAM PAUSED' : 'LIVE TRANSMITTING'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className={`${styles.statusDot} ${styles.dotIdle}`} />
+                  <span className={styles.statusText}>READY TO STREAM</span>
+                </>
+              )}
+            </div>
+
+            <div className={styles.streamTarget}>
+              Dictating: <strong style={{ textTransform: 'uppercase', color: '#2563eb' }}>{state.dictationTarget === 'none' ? 'mission' : state.dictationTarget}</strong>
+            </div>
           </div>
-        </div>
 
-        <div className={styles.controlsContainer}>
-          {/* Rewind 10 Button */}
-          <button 
-            type="button" 
-            onClick={handleRewind} 
-            className={styles.navButton} 
-            title="Rewind 10 seconds"
-          >
-            <img src={tenMinutesBehiend} alt="Rewind 10" className={styles.navSvg} />
-          </button>
-
-          {/* Recording & Playback Central Buttons */}
-          <div className={styles.centerButtons}>
-            {isRecording ? (
-              <>
-                {/* Stop Recording Button */}
-                <button
-                  type="button"
-                  className={styles.stopButton}
-                  onClick={handleToggleRecording}
-                  title="Stop Recording"
-                >
-                  <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
-                </button>
-
-                {/* Pause/Resume Recording Button */}
-                <button
-                  type="button"
-                  className={`${styles.pauseButton} ${isPaused ? styles.pausedActive : ''}`}
-                  onClick={handlePauseToggle}
-                  title={isPaused ? "Resume Recording" : "Pause Recording"}
-                >
-                  <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
-                </button>
-              </>
-            ) : hasAudio ? (
-              <>
-                {/* Re-record Discard Button */}
-                <button
-                  type="button"
-                  className={styles.micButton}
-                  onClick={handleDiscardAudio}
-                  title="Discard and Record Again"
-                >
-                  <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
-                </button>
-
-                {/* Play/Pause Playback Button */}
-                <button
-                  type="button"
-                  className={`${styles.pauseButton} ${isPlaying ? styles.pausedActive : ''}`}
-                  onClick={handlePlayPause}
-                  title={isPlaying ? "Pause Playback" : "Start Playback"}
-                >
-                  {isPlaying ? (
-                    <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
-                  ) : (
-                    <span style={{ fontSize: '1.1rem', color: '#2563eb' }}>▶️</span>
-                  )}
-                </button>
-
-                {/* Stop Playback Button */}
-                <button
-                  type="button"
-                  className={styles.stopButton}
-                  onClick={handleStopPlayback}
-                  title="Stop Playback"
-                >
-                  <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
-                </button>
-              </>
+          {/* Visual Signal Level Indicator */}
+          <div className={styles.visualizerContainer}>
+            {isStreaming && !isStreamPaused ? (
+              <div className={styles.barsContainer}>
+                {[...Array(15)].map((_, i) => {
+                  const factor = Math.sin((i / 14) * Math.PI) * 0.7 + 0.3;
+                  const barHeight = Math.max(6, Math.round(audioLevel * factor * 0.75));
+                  return (
+                    <div
+                      key={i}
+                      className={styles.visualizerBar}
+                      style={{
+                        height: `${barHeight}px`,
+                        backgroundColor: isMuted ? '#94a3b8' : '#2563eb',
+                      }}
+                    />
+                  );
+                })}
+              </div>
             ) : (
-              /* Idle Mic Button to Start Recording */
-              <button
-                type="button"
-                className={styles.micButton}
-                onClick={handleToggleRecording}
-                disabled={isTranscribing}
-                title="Start Recording"
-              >
-                <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
-              </button>
+              <div className={styles.visualizerPlaceholder}>
+                {isStreamPaused ? 'Streaming Paused' : 'Microphone Idle'}
+              </div>
             )}
           </div>
 
-          {/* Forward 10 Button */}
-          <button 
-            type="button" 
-            onClick={handleForward} 
-            className={styles.navButton} 
-            title="Forward 10 seconds"
-          >
-            <img src={tenMinutesAhead} alt="Forward 10" className={styles.navSvg} />
-          </button>
-        </div>
+          {/* Live Subtitles Overlay */}
+          <div className={styles.subtitlesContainer}>
+            <p className={styles.subtitleLabel}>Live Transcription:</p>
+            <div className={styles.subtitleText}>
+              {partialTranscript ? (
+                partialTranscript
+              ) : (
+                <span className={styles.placeholderText}>Click Start Live Stream and begin speaking to transcribe in real-time...</span>
+              )}
+            </div>
+          </div>
 
-        {error ? <p className={styles.errorText}>{error}</p> : null}
-      </div>
+          {/* Streaming Controls */}
+          <div className={styles.streamControls}>
+            {!isStreaming ? (
+              <button
+                type="button"
+                className={styles.startStreamBtn}
+                onClick={() => {
+                  const activeField = state.dictationTarget === 'none' ? 'mission' : state.dictationTarget;
+                  const initialText = state.data.startPreparation[activeField] || '';
+                  startStreaming(initialText);
+                }}
+              >
+                🎙️ Start Live Stream
+              </button>
+            ) : (
+              <div className={styles.controlsRow}>
+                <button
+                  type="button"
+                  className={`${styles.streamControlBtn} ${isStreamPaused ? styles.btnActive : ''}`}
+                  onClick={togglePauseStreaming}
+                  title={isStreamPaused ? "Resume Live Stream" : "Pause Live Stream"}
+                >
+                  {isStreamPaused ? '▶️ Resume' : '⏸️ Pause'}
+                </button>
+
+                <button
+                  type="button"
+                  className={`${styles.streamControlBtn} ${isMuted ? styles.btnDanger : ''}`}
+                  onClick={toggleMuteStreaming}
+                  title={isMuted ? "Unmute Mic" : "Mute Mic"}
+                >
+                  {isMuted ? '🎙️ Unmute' : '🔇 Mute'}
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.streamControlBtn}
+                  onClick={clearTranscript}
+                  title="Clear field"
+                >
+                  🗑️ Clear
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.stopStreamBtn}
+                  onClick={stopStreaming}
+                  title="Finish Streaming & Save"
+                >
+                  🛑 Stop
+                </button>
+              </div>
+            )}
+          </div>
+
+          {streamError && <p className={styles.errorText}>{streamError}</p>}
+        </div>
+      ) : (
+        /* Classic WaveSurfer Recorder Mode */
+        <div className={styles.waveformCard}>
+          <div className={styles.waveformContainer}>
+            <div className={styles.waveformElement} ref={waveformRef} />
+            <div className={styles.waveformOverlay}>
+              <div className={styles.cursorLine} />
+            </div>
+          </div>
+
+          <div className={styles.controlsContainer}>
+            {/* Rewind 10 Button */}
+            <button 
+              type="button" 
+              onClick={seekBackward} 
+              className={styles.navButton} 
+              title="Rewind 10 seconds"
+            >
+              <img src={tenMinutesBehiend} alt="Rewind 10" className={styles.navSvg} />
+            </button>
+
+            {/* Recording & Playback Central Buttons */}
+            <div className={styles.centerButtons}>
+              {isRecording ? (
+                <>
+                  {/* Stop Recording Button */}
+                  <button
+                    type="button"
+                    className={styles.stopButton}
+                    onClick={stopRecording}
+                    title="Stop Recording"
+                  >
+                    <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
+                  </button>
+
+                  {/* Pause/Resume Recording Button */}
+                  <button
+                    type="button"
+                    className={`${styles.pauseButton} ${isRecPaused ? styles.pausedActive : ''}`}
+                    onClick={togglePauseRecording}
+                    title={isRecPaused ? "Resume Recording" : "Pause Recording"}
+                  >
+                    <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
+                  </button>
+                </>
+              ) : hasAudio ? (
+                <>
+                  {/* Re-record Discard Button */}
+                  <button
+                    type="button"
+                    className={styles.micButton}
+                    onClick={discardAudio}
+                    title="Discard and Record Again"
+                  >
+                    <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
+                  </button>
+
+                  {/* Play/Pause Playback Button */}
+                  <button
+                    type="button"
+                    className={`${styles.pauseButton} ${isPlaying ? styles.pausedActive : ''}`}
+                    onClick={togglePlayPausePlayback}
+                    title={isPlaying ? "Pause Playback" : "Start Playback"}
+                  >
+                    {isPlaying ? (
+                      <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
+                    ) : (
+                      <span style={{ fontSize: '1.1rem', color: '#2563eb' }}>▶️</span>
+                    )}
+                  </button>
+
+                  {/* Stop Playback Button */}
+                  <button
+                    type="button"
+                    className={styles.stopButton}
+                    onClick={stopPlayback}
+                    title="Stop Playback"
+                  >
+                    <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
+                  </button>
+                </>
+              ) : (
+                /* Idle Mic Button to Start Recording */
+                <button
+                  type="button"
+                  className={styles.micButton}
+                  onClick={startRecording}
+                  disabled={isTranscribing}
+                  title="Start Recording"
+                >
+                  <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
+                </button>
+              )}
+            </div>
+
+            {/* Forward 10 Button */}
+            <button 
+              type="button" 
+              onClick={seekForward} 
+              className={styles.navButton} 
+              title="Forward 10 seconds"
+            >
+              <img src={tenMinutesAhead} alt="Forward 10" className={styles.navSvg} />
+            </button>
+          </div>
+
+          {recError ? (
+            <p className={styles.errorText}>
+              {recError.includes("Microphone blocked") ? (
+                <>
+                  Microphone blocked: Browsers require HTTPS to access audio on a LAN. Click here to open the{' '}
+                  <a href="/setup" target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline', fontWeight: 'bold' }}>
+                    Microphone Setup Guide
+                  </a>{' '}
+                  to download and install the security certificate.
+                </>
+              ) : (
+                recError
+              )}
+            </p>
+          ) : null}
+        </div>
+      )}
     </section>
   );
 }

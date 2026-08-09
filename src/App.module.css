@@ -1,0 +1,149 @@
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.titleBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e0ecfb;
+  color: #1d4ed8;
+  padding: 0.4rem 1rem;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #cbd5e1;
+  font-weight: bold;
+  user-select: none;
+  position: relative;
+}
+
+.titleLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.titleRight {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.windowControls {
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  color: #1d4ed8;
+}
+
+.windowControlItem {
+  cursor: pointer;
+}
+
+.windowControlItemClose {
+  cursor: pointer;
+  color: #ef4444;
+}
+
+.workspaceWrapper {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.mainContent {
+  flex: 1;
+  min-height: 0;
+  background: #eef2ff;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 3px solid transparent;
+  border-radius: 4px;
+  margin: 0.25rem;
+  transition: border 0.15s ease;
+}
+
+.mainContentActive {
+  border: 3px solid #0087e0;
+}
+
+.cardSection {
+  flex: 1;
+  min-height: 0;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.toolbarWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.recorderArea {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepBarRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.stepBarCol {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.sidebarContainer {
+  width: 440px;
+  min-width: 440px;
+  border-left: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1rem;
+  background: transparent;
+}
+
+.savedPlansContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0.5rem 0;
+}
+
+.savedPlansTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1rem 0;
+}
+
+.savedPlansEmptyBox {
+  flex: 1;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.85rem;
+}

@@ -233,3 +233,250 @@
   height: 20px;
   object-fit: contain;
 }
+
+/* Tab Selector Styles */
+.tabContainer {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.tabButton {
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.tabButton:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.tabActive {
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+/* WebSocket Streaming Layout */
+.streamCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 180px;
+}
+
+.streamHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.streamStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dotActive {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulse 1.2s infinite alternate;
+}
+
+.dotPaused {
+  background-color: #f59e0b;
+}
+
+.dotIdle {
+  background-color: #94a3b8;
+}
+
+.statusText {
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.05em;
+}
+
+.streamTarget {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Live Signal Level Indicator */
+.visualizerContainer {
+  background: #0f172a;
+  border-radius: 4px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+}
+
+.barsContainer {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 100%;
+}
+
+.visualizerBar {
+  width: 4px;
+  border-radius: 2px;
+  transition: height 0.08s ease;
+}
+
+.visualizerPlaceholder {
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Live Subtitles Area */
+.subtitlesContainer {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.subtitleLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.subtitleText {
+  font-size: 0.85rem;
+  color: #0f172a;
+  line-height: 1.4;
+  overflow-y: auto;
+  max-height: 100px;
+  font-weight: 500;
+}
+
+.placeholderText {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Controls */
+.streamControls {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.startStreamBtn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transition: all 0.15s ease;
+}
+
+.startStreamBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.startStreamBtn:active {
+  transform: translateY(0);
+}
+
+.controlsRow {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.streamControlBtn {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.streamControlBtn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btnActive {
+  background: #eef2ff;
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.btnDanger {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #ef4444;
+}
+
+.stopStreamBtn {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+  transition: all 0.15s ease;
+}
+
+.stopStreamBtn:hover {
+  background: #dc2626;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+

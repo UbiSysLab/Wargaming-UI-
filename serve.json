@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/transcribe",
+      "destination": "http://127.0.0.1:8000/transcribe"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/**",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    }
+  ]
+}

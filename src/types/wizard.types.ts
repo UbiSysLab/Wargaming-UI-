@@ -17,7 +17,7 @@ export interface StepDefinition {
   label: string;
 }
 
-export type DictationTarget = 'mission' | 'execution' | 'none';
+export type DictationTarget = 'situation' | 'mission' | 'execution' | 'none';
 
 export interface WizardData {
   login: LoginData | null;

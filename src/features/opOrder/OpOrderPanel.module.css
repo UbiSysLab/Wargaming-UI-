@@ -18,7 +18,15 @@
   color: #0f172a;
 }
 
-.grid {
+.metadataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex-shrink: 0;
+  margin-bottom: 0.25rem;
+}
+
+.scrollableDictation {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -29,21 +37,21 @@
 }
 
 /* Custom scrollbar track for clean visual design */
-.grid::-webkit-scrollbar {
+.scrollableDictation::-webkit-scrollbar {
   width: 5px;
 }
 
-.grid::-webkit-scrollbar-track {
+.scrollableDictation::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 99px;
 }
 
-.grid::-webkit-scrollbar-thumb {
+.scrollableDictation::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 99px;
 }
 
-.grid::-webkit-scrollbar-thumb:hover {
+.scrollableDictation::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 

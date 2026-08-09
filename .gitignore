@@ -7,15 +7,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node dependencies and build folders
 node_modules
 dist
 dist-ssr
 *.local
 
+# Python environment and caches
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Generated LAN configurations and SSL credentials (do NOT commit private keys)
+certs/
+public/config.json
+
+# Local developer scratchpad & large archives
+scratch/
+ngrok.zip
+
+# PyInstaller / Build artifacts
+build/
+*.spec
+*.exe
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*

@@ -22,6 +22,7 @@ export const initialWizardData: WizardData = {
     references: '',
     from: '',
     to: '',
+    situation: '',
     mission: '',
     execution: '',
   },

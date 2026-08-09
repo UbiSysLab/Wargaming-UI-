@@ -5,6 +5,7 @@ export interface OpOrderData {
   references: string;
   from: string;
   to: string;
+  situation: string;
   mission: string;
   execution: string;
 }

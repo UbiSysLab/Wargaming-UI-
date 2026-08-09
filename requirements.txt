@@ -1,0 +1,7 @@
+Flask
+requests
+dnslib
+pyinstaller
+cryptography
+reportlab
+

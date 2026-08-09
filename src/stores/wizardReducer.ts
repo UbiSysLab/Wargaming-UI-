@@ -5,12 +5,14 @@ export interface WizardState {
   currentStep: WizardStep;
   data: WizardData;
   dictationTarget: DictationTarget;
+  isTranscribing: boolean;
 }
 
 export const initialWizardState: WizardState = {
   currentStep: 'startPreparation',
   data: initialWizardData,
   dictationTarget: 'none',
+  isTranscribing: false,
 };
 
 /**
@@ -29,6 +31,7 @@ export type WizardAction =
       payload: { [K in WizardStep]: { step: K; data: Partial<WizardData[K]> } }[WizardStep];
     }
   | { type: 'SET_DICTATION_TARGET'; payload: DictationTarget }
+  | { type: 'SET_TRANSCRIBING'; payload: boolean }
   | { type: 'RESTART' };
 
 function clampStepIndex(index: number): number {
@@ -57,6 +60,9 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
 
     case 'SET_DICTATION_TARGET':
       return { ...state, dictationTarget: action.payload };
+
+    case 'SET_TRANSCRIBING':
+      return { ...state, isTranscribing: action.payload };
 
     case 'RESTART':
       return initialWizardState;
