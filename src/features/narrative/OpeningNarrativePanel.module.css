@@ -1,0 +1,149 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.scrollArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Custom subtle scrollbar */
+.scrollArea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollArea::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 99px;
+}
+
+.scrollArea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+.scrollArea::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.welcomeHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.welcomeTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.teamSubtext {
+  font-size: 0.82rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.blueTeamBadge {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-color: #0066cc;
+  border-radius: 2px;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0.15rem 0;
+  flex-shrink: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionHeading {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.paragraph {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #334155;
+  margin: 0;
+}
+
+.redForceTag {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.blueForceTag {
+  color: #0066cc;
+  font-weight: 700;
+}
+
+.rulesList {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ruleItem {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.bottomActionRow {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.nextButton {
+  background-color: #0066cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.nextButton:hover {
+  background-color: #0052a3;
+}
+
+.nextButton:active {
+  background-color: #004080;
+}

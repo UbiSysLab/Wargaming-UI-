@@ -1,39 +1,30 @@
 .container {
   display: flex;
-  gap: 16px;
   align-items: center;
-  padding: 8px 0 12px;
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  background: #ffffff;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.25rem 0 0.5rem 0;
   width: 100%;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  padding-right: 16px;
-  border-right: 1px solid #e6e6e6;
-  margin-right: 16px;
+  flex-shrink: 0;
+  padding-right: 1.5rem;
+  border-right: 1px solid #e2e8f0;
 }
 
 .brandImg {
-  height: 56px;
+  height: 52px;
   width: auto;
+  object-fit: contain;
 }
 
 .actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-}
-
-.actions > button {
-  flex: 0 0 calc(33.333% - 8px);
-  min-width: 120px;
-  padding: 6px 10px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem 0.75rem;
+  flex: 1;
+  max-width: 680px;
 }

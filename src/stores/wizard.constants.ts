@@ -1,18 +1,17 @@
 import { StepDefinition, WizardData } from '../types/wizard.types';
+import { DEFAULT_NARRATIVE_DATA } from '../features/narrative/narrativeApi';
 
 export const STEP_ORDER: StepDefinition[] = [
-  { id: 'login', order: 1, label: 'Login' },
-  { id: 'openingNarrative', order: 2, label: 'Opening Narrative / General Idea' },
-  { id: 'warningOrder', order: 3, label: 'Warning Order / Special Idea' },
-  { id: 'mapBrief', order: 4, label: 'Map Brief' },
-  { id: 'resourceOrbat', order: 5, label: 'Resource & ORBAT' },
-  { id: 'startPreparation', order: 6, label: 'Start Preperation' },
+  { id: 'openingNarrative', order: 1, label: 'Opening Narrative / General Idea' },
+  { id: 'warningOrder', order: 2, label: 'Warning Order / Special Idea' },
+  { id: 'mapBrief', order: 3, label: 'Map Brief' },
+  { id: 'resourceOrbat', order: 4, label: 'Resource & ORBAT' },
+  { id: 'startPreparation', order: 5, label: 'Start Preperation' },
 ];
 
 export const initialWizardData: WizardData = {
-  login: null,
-  openingNarrative: { narrativeText: '' },
-  warningOrder: { narrativeText: '' },
+  openingNarrative: DEFAULT_NARRATIVE_DATA,
+  warningOrder: { ...DEFAULT_NARRATIVE_DATA },
   mapBrief: { notes: '' },
   resourceOrbat: { notes: '' },
   startPreparation: {
@@ -22,7 +21,11 @@ export const initialWizardData: WizardData = {
     references: '',
     from: '',
     to: '',
+    enemy: '',
+    own: '',
     mission: '',
     execution: '',
+    adminLogistics: '',
+    commandSignal: '',
   },
 };

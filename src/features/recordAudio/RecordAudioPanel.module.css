@@ -1,76 +1,90 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   min-height: 0;
-  height: 100%;
+  width: 100%;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding: 0 0.25rem;
+}
+
+.sectionHeading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  margin: 0;
 }
 
 .closeButton {
-  position: absolute;
-  right: 0.5rem;
-  top: 0.5rem;
   background: transparent;
   border: none;
   font-size: 1.15rem;
-  font-weight: bold;
-  color: #64748b;
+  font-weight: 600;
+  color: #94a3b8;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.2rem 0.4rem;
   line-height: 1;
   transition: color 0.15s ease;
-  z-index: 5;
+  border-radius: 4px;
 }
 
 .closeButton:hover {
   color: #0f172a;
+  background: #f1f5f9;
 }
 
-.waveformCard {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 0.75rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: 140px;
-}
-
+/* Waveform container box */
 .waveformContainer {
   position: relative;
-  background: #f1f5f9;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
-  min-height: 80px;
-  height: 80px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  min-height: 160px;
+  height: 160px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Center horizontal baseline */
+.baseline {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 1.5px;
+  background: #475569;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .waveformElement {
-  width: 100%;
-  height: 80px;
+  width: 90%;
+  height: 100px;
+  position: relative;
+  z-index: 2;
 }
 
-.waveformOverlay {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-}
-
-/* Center blue cursor line with a round dot pointer at the bottom margin */
+/* Blue vertical cursor line with round pin dot at bottom */
 .cursorLine {
   position: absolute;
   left: 50%;
-  top: 0;
+  top: 15%;
+  bottom: 15%;
   width: 2px;
-  height: 100%;
+  background: #0087e0;
   transform: translateX(-50%);
-  background: #2563eb;
-  opacity: 0.9;
+  pointer-events: none;
+  z-index: 3;
 }
 
 .cursorLine::after {
@@ -78,19 +92,20 @@
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 6px;
-  height: 6px;
-  background: #2563eb;
+  width: 8px;
+  height: 8px;
+  background: #0087e0;
   border-radius: 50%;
   transform: translate(-50%, 50%);
 }
 
+/* Controls row */
 .controlsContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  margin-top: 0.25rem;
+  gap: 2.25rem;
+  padding: 0.25rem 0;
 }
 
 .navButton {
@@ -101,135 +116,117 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.15rem;
+  padding: 0.25rem;
   transition: transform 0.1s ease;
   user-select: none;
-  min-width: 40px;
 }
 
 .navButton:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
-.navIcon {
-  font-size: 1.4rem;
-  color: #7f7f7f;
-  line-height: 1;
-}
-
-.navText {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #7f7f7f;
-  margin-top: -2px;
+.navSvg {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
 }
 
 .centerButtons {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .micButton {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #ffffff;
-  border: 1.5px solid #2563eb;
+  border: 2px solid #0087e0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.1);
-  transition: background-color 0.15s, transform 0.1s;
+  transition: all 0.15s ease;
 }
 
 .micButton:hover {
-  background-color: #f0f4ff;
+  background: #f0f7ff;
+  transform: scale(1.04);
 }
 
 .micButton:active {
   transform: scale(0.95);
 }
 
-.micIcon {
-  font-size: 1.15rem;
+.micIconImg {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
 .stopButton {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: #ffffff;
-  border: 1.5px solid #334155;
+  border: 2px solid #1e293b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.15s, transform 0.1s;
+  transition: all 0.15s ease;
 }
 
 .stopButton:hover {
-  background-color: #f1f5f9;
+  background: #f1f5f9;
+  transform: scale(1.04);
 }
 
 .stopButton:active {
   transform: scale(0.95);
 }
 
-.stopIcon {
-  font-size: 1.05rem;
-}
-
 .pauseButton {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: #ffffff;
-  border: 1.5px solid #2563eb;
+  border: 2px solid #0087e0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.1);
-  transition: background-color 0.15s, transform 0.1s;
+  transition: all 0.15s ease;
 }
 
 .pauseButton:hover {
-  background-color: #f0f4ff;
+  background: #f0f7ff;
+  transform: scale(1.04);
 }
 
 .pausedActive {
-  background-color: #2563eb;
-  border-color: #2563eb;
+  background: #0087e0;
+  border-color: #0087e0;
 }
 
-.pausedActive .pauseIcon {
-  filter: brightness(0) invert(1);
-}
-
-.pauseIcon {
-  font-size: 1.05rem;
-}
-
-.errorText {
-  color: #b91c1c;
-  font-size: 0.85rem;
-  margin: 0;
-  text-align: center;
-}
-
-.navSvg {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.micIconImg,
-.stopIconImg,
-.pauseIconImg {
+.controlIconImg {
   width: 20px;
   height: 20px;
   object-fit: contain;
+}
+
+.statusText {
+  color: #0087e0;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  text-align: center;
 }

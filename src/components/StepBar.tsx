@@ -30,31 +30,24 @@ export function StepBar() {
         </>
       );
     }
-    if (label === 'Start Preperation') {
-      return (
-        <>
-          Start
-          <br />
-          Preperation
-        </>
-      );
-    }
     return label;
   };
 
   return (
-    <nav className={styles.stepBar} aria-label="Wizard steps" style={{ padding: '0.3rem 0.4rem' }}>
+    <nav className={styles.stepBar} aria-label="Wizard steps">
       {STEP_ORDER.map((step) => {
         const isActive = step.id === currentStep;
         return (
           <button
             key={step.id}
             type="button"
-            className={`${styles.step} ${isActive ? styles.stepActive : ''}`}
+            className={styles.step}
             onClick={() => dispatch({ type: 'GO_TO_STEP', payload: step.id })}
             aria-current={isActive ? 'step' : undefined}
           >
-            <span className={`${styles.oval} ${isActive ? styles.ovalActive : ''}`}>{step.order}</span>
+            <span className={`${styles.circle} ${isActive ? styles.circleActive : ''}`}>
+              {step.order}
+            </span>
             <span className={`${styles.label} ${isActive ? styles.labelActive : ''}`}>
               {renderLabel(step.label)}
             </span>

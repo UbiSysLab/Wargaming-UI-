@@ -1,15 +1,14 @@
-//A file containg types  related to app flow 
+// A file containing types related to the 5 wargaming flows
 
-import { LoginData } from '../features/login/login.types';
 import { NarrativeData } from '../features/narrative/narrative.types';
 import { OpOrderData } from '../features/opOrder/opOrder.types';
+
 export type WizardStep =
-  | 'login'
   | 'openingNarrative'
   | 'warningOrder'
   | 'mapBrief'
   | 'resourceOrbat'
-  | 'startPreparation'
+  | 'startPreparation';
 
 export interface StepDefinition {
   id: WizardStep;
@@ -17,14 +16,12 @@ export interface StepDefinition {
   label: string;
 }
 
-export type DictationTarget = 'mission' | 'execution' | 'none';
+export type DictationTarget = 'enemy' | 'own' | 'mission' | 'execution' | 'adminLogistics' | 'commandSignal' | 'none';
 
 export interface WizardData {
-  login: LoginData | null;
   openingNarrative: NarrativeData;
   warningOrder: NarrativeData;
   mapBrief: { notes: string };
   resourceOrbat: { notes: string };
   startPreparation: OpOrderData;
 }
-

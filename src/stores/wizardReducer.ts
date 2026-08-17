@@ -8,18 +8,11 @@ export interface WizardState {
 }
 
 export const initialWizardState: WizardState = {
-  currentStep: 'startPreparation',
+  currentStep: 'openingNarrative',
   data: initialWizardData,
   dictationTarget: 'none',
 };
 
-/**
- * TS CONCEPT: discriminated union of actions.
- * Each variant has a `type` field with a distinct literal string — the
- * "discriminant". Inside the switch below, checking `action.type === 'X'`
- * makes TypeScript automatically narrow `action` to ONLY that variant,
- * so `action.payload` is correctly typed with zero casting needed.
- */
 export type WizardAction =
   | { type: 'GO_TO_STEP'; payload: WizardStep }
   | { type: 'NEXT_STEP' }
@@ -62,13 +55,8 @@ export function wizardReducer(state: WizardState, action: WizardAction): WizardS
       return initialWizardState;
 
     default: {
-      // TS CONCEPT: exhaustiveness check.
-      // If a new action variant is ever added to WizardAction but a case
-      // for it is missing above, `action` here has type `never` — meaning
-      // TypeScript proves no value could possibly reach this line. If you
-      // forget a case, this line fails to compile, forcing you to handle it.
       const _exhaustive: never = action;
       return state;
     }
   }
-}
+}

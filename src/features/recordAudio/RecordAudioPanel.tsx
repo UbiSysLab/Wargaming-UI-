@@ -14,6 +14,15 @@ interface RecordAudioPanelProps {
   onClose?: () => void;
 }
 
+const SECTION_LABELS: Record<string, string> = {
+  enemy: 'Enemy',
+  own: 'Own',
+  mission: 'Mission',
+  execution: 'Execution',
+  adminLogistics: 'Administration & Logistics',
+  commandSignal: 'Command & Signal',
+};
+
 export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
   const { state, dispatch } = useWizard();
   const waveformRef = useRef<HTMLDivElement | null>(null);
@@ -23,11 +32,15 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [hasAudio, setHasAudio] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  // Use ref to store dictation target to avoid stale closure in wavesurfer callbacks
+  // Active section heading based on dictationTarget (defaults to 'Enemy')
+  const activeSectionLabel = 
+    state.dictationTarget !== 'none' 
+      ? SECTION_LABELS[state.dictationTarget] || 'Enemy'
+      : 'Enemy';
+
+  // Use ref to store dictation target to avoid stale closure in callbacks
   const dictationTargetRef = useRef(state.dictationTarget);
   useEffect(() => {
     dictationTargetRef.current = state.dictationTarget;
@@ -50,12 +63,13 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     const wavesurfer = WaveSurfer.create({
       container: waveformRef.current,
       backend: 'WebAudio',
-      height: 80,
-      waveColor: '#7f7f7f',
-      progressColor: '#2563eb',
-      cursorColor: '#2563eb',
+      height: 100,
+      waveColor: '#1e293b',
+      progressColor: '#1e293b',
+      cursorColor: '#0087e0',
       cursorWidth: 0,
       barWidth: 2,
+      barGap: 3,
       barRadius: 2,
       normalize: true,
       plugins: [recordPlugin],
@@ -64,17 +78,10 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     wsRef.current = wavesurfer;
     recordPluginRef.current = recordPlugin;
 
-    // Listen to play/pause state of wavesurfer playback
-    const unsubPlay = wavesurfer.on('play', () => setIsPlaying(true));
-    const unsubPause = wavesurfer.on('pause', () => setIsPlaying(false));
-    const unsubFinish = wavesurfer.on('finish', () => setIsPlaying(false));
-
     const onRecordStart = () => {
       setError(undefined);
       setIsRecording(true);
       setIsPaused(false);
-      setHasAudio(false);
-      setIsPlaying(false);
     };
 
     const onRecordEnd = async (blob: Blob) => {
@@ -84,16 +91,11 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
       setError(undefined);
 
       try {
-        // Load the recorded blob URL into wavesurfer for playback
-        const url = URL.createObjectURL(blob);
-        wavesurfer.load(url);
-        setHasAudio(true);
-
         const result = await transcribeAudio(blob);
         const text = result.text.trim();
         
-        // Dispatch text to active target (mission / execution)
-        const target = dictationTargetRef.current === 'none' ? 'execution' : dictationTargetRef.current;
+        // Dispatch text directly to active target (default to enemy if none)
+        const target = dictationTargetRef.current === 'none' ? 'enemy' : dictationTargetRef.current;
         dispatch({
           type: 'UPDATE_STEP_DATA',
           payload: { step: 'startPreparation', data: { [target]: text } },
@@ -109,9 +111,6 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     const removeEnd = recordPlugin.on('record-end', onRecordEnd);
 
     return () => {
-      unsubPlay();
-      unsubPause();
-      unsubFinish();
       removeStart();
       removeEnd();
       recordPlugin.destroy();
@@ -121,9 +120,7 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
 
   const handleToggleRecording = useCallback(async () => {
     const plugin = recordPluginRef.current;
-    if (!plugin) {
-      return;
-    }
+    if (!plugin) return;
 
     if (isRecording) {
       plugin.stopRecording();
@@ -132,8 +129,6 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
 
     try {
       setError(undefined);
-      setHasAudio(false);
-      setIsPlaying(false);
       await plugin.startRecording();
     } catch (startError) {
       setError(startError instanceof Error ? startError.message : 'Unable to start recording.');
@@ -151,36 +146,6 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     } else {
       plugin.pauseRecording();
       setIsPaused(true);
-    }
-  }, []);
-
-  // Playback Control Handlers
-  const handlePlayPause = useCallback(() => {
-    if (wsRef.current && hasAudio) {
-      if (wsRef.current.isPlaying()) {
-        wsRef.current.pause();
-      } else {
-        wsRef.current.play();
-      }
-    }
-  }, [hasAudio]);
-
-  const handleStopPlayback = useCallback(() => {
-    if (wsRef.current && hasAudio) {
-      wsRef.current.pause();
-      wsRef.current.setTime(0);
-    }
-  }, [hasAudio]);
-
-  const handleDiscardAudio = useCallback(() => {
-    if (wsRef.current) {
-      try {
-        wsRef.current.empty();
-      } catch (e) {
-        // Safe clear
-      }
-      setHasAudio(false);
-      setIsPlaying(false);
     }
   }, []);
 
@@ -208,124 +173,100 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
   }, []);
 
   return (
-    <section className={styles.panel} aria-label="Record audio panel" style={{ position: 'relative' }}>
-      {onClose && (
+    <div className={styles.panel} aria-label="Record audio panel">
+      {/* Header with Section title on Left and Close button on Right */}
+      <div className={styles.headerRow}>
+        <h2 className={styles.sectionHeading}>{activeSectionLabel}</h2>
+        {onClose && (
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className={styles.closeButton}
+            aria-label="Close recorder"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* Waveform Card Container */}
+      <div className={styles.waveformContainer}>
+        {/* Center horizontal baseline line */}
+        <div className={styles.baseline} />
+        
+        {/* WaveSurfer canvas container */}
+        <div className={styles.waveformElement} ref={waveformRef} />
+        
+        {/* Blue vertical cursor indicator with dot pin */}
+        <div className={styles.cursorLine} />
+      </div>
+
+      {/* Controls row: Rewind 10, Mic button / (Stop + Pause when recording), Forward 10 */}
+      <div className={styles.controlsContainer}>
+        {/* Rewind 10 Button */}
         <button 
           type="button" 
-          onClick={onClose} 
-          className={styles.closeButton}
-          aria-label="Close recorder"
+          onClick={handleRewind} 
+          className={styles.navButton} 
+          title="Rewind 10 seconds"
         >
-          ✕
+          <img src={tenMinutesBehiend} alt="Rewind 10" className={styles.navSvg} />
         </button>
-      )}
 
-      <div className={styles.waveformCard}>
-        <div className={styles.waveformContainer}>
-          <div className={styles.waveformElement} ref={waveformRef} />
-          <div className={styles.waveformOverlay}>
-            <div className={styles.cursorLine} />
-          </div>
-        </div>
-
-        <div className={styles.controlsContainer}>
-          {/* Rewind 10 Button */}
-          <button 
-            type="button" 
-            onClick={handleRewind} 
-            className={styles.navButton} 
-            title="Rewind 10 seconds"
-          >
-            <img src={tenMinutesBehiend} alt="Rewind 10" className={styles.navSvg} />
-          </button>
-
-          {/* Recording & Playback Central Buttons */}
-          <div className={styles.centerButtons}>
-            {isRecording ? (
-              <>
-                {/* Stop Recording Button */}
-                <button
-                  type="button"
-                  className={styles.stopButton}
-                  onClick={handleToggleRecording}
-                  title="Stop Recording"
-                >
-                  <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
-                </button>
-
-                {/* Pause/Resume Recording Button */}
-                <button
-                  type="button"
-                  className={`${styles.pauseButton} ${isPaused ? styles.pausedActive : ''}`}
-                  onClick={handlePauseToggle}
-                  title={isPaused ? "Resume Recording" : "Pause Recording"}
-                >
-                  <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
-                </button>
-              </>
-            ) : hasAudio ? (
-              <>
-                {/* Re-record Discard Button */}
-                <button
-                  type="button"
-                  className={styles.micButton}
-                  onClick={handleDiscardAudio}
-                  title="Discard and Record Again"
-                >
-                  <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
-                </button>
-
-                {/* Play/Pause Playback Button */}
-                <button
-                  type="button"
-                  className={`${styles.pauseButton} ${isPlaying ? styles.pausedActive : ''}`}
-                  onClick={handlePlayPause}
-                  title={isPlaying ? "Pause Playback" : "Start Playback"}
-                >
-                  {isPlaying ? (
-                    <img src={pauseIcon} alt="Pause" className={styles.pauseIconImg} />
-                  ) : (
-                    <span style={{ fontSize: '1.1rem', color: '#2563eb' }}>▶️</span>
-                  )}
-                </button>
-
-                {/* Stop Playback Button */}
-                <button
-                  type="button"
-                  className={styles.stopButton}
-                  onClick={handleStopPlayback}
-                  title="Stop Playback"
-                >
-                  <img src={ongoingAudio} alt="Stop" className={styles.stopIconImg} />
-                </button>
-              </>
-            ) : (
-              /* Idle Mic Button to Start Recording */
+        {/* Central Record Controls */}
+        <div className={styles.centerButtons}>
+          {isRecording ? (
+            <>
+              {/* Stop Recording Button -> Stops and transcribes directly into target */}
               <button
                 type="button"
-                className={styles.micButton}
+                className={styles.stopButton}
                 onClick={handleToggleRecording}
-                disabled={isTranscribing}
-                title="Start Recording"
+                title="Stop Recording"
               >
-                <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
+                <img src={ongoingAudio} alt="Stop" className={styles.controlIconImg} />
               </button>
-            )}
-          </div>
 
-          {/* Forward 10 Button */}
-          <button 
-            type="button" 
-            onClick={handleForward} 
-            className={styles.navButton} 
-            title="Forward 10 seconds"
-          >
-            <img src={tenMinutesAhead} alt="Forward 10" className={styles.navSvg} />
-          </button>
+              {/* Pause/Resume Recording Button */}
+              <button
+                type="button"
+                className={`${styles.pauseButton} ${isPaused ? styles.pausedActive : ''}`}
+                onClick={handlePauseToggle}
+                title={isPaused ? "Resume Recording" : "Pause Recording"}
+              >
+                <img src={pauseIcon} alt="Pause" className={styles.controlIconImg} />
+              </button>
+            </>
+          ) : (
+            /* Idle Mic Button to Start Recording */
+            <button
+              type="button"
+              className={styles.micButton}
+              onClick={handleToggleRecording}
+              disabled={isTranscribing}
+              title="Start Recording"
+            >
+              <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
+            </button>
+          )}
         </div>
 
-        {error ? <p className={styles.errorText}>{error}</p> : null}
+        {/* Forward 10 Button */}
+        <button 
+          type="button" 
+          onClick={handleForward} 
+          className={styles.navButton} 
+          title="Forward 10 seconds"
+        >
+          <img src={tenMinutesAhead} alt="Forward 10" className={styles.navSvg} />
+        </button>
       </div>
-    </section>
+
+      {isTranscribing && (
+        <p className={styles.statusText}>Transcribing audio...</p>
+      )}
+
+      {error ? <p className={styles.errorText}>{error}</p> : null}
+    </div>
   );
 }

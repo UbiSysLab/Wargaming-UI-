@@ -1,40 +1,52 @@
 .iconButton {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: var(--surface, #ffffff);
-  border: 1px solid var(--border, #e6e6e6);
-  cursor: pointer;
-  transition: box-shadow 0.12s ease;
   justify-content: center;
-  min-width: 0;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1.5px solid #0087e0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 36px;
+  user-select: none;
 }
-.iconButton:focus {
-  outline: 2px solid var(--accent, #2563eb);
+
+.iconButton:hover {
+  background: #f0f7ff;
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid #0087e0;
   outline-offset: 2px;
 }
+
 .icon {
-  width: clamp(18px, 2vw, 28px);
-  height: clamp(18px, 2vw, 28px);
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
+
 .label {
-  font-size: 0.82rem;
-  color: var(--text, #111827);
-  line-height: 1.25;
-  white-space: normal;
-  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+  white-space: nowrap;
   text-align: left;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
+
 .active {
-  background: #0060df !important;
-  border-color: #0056c6 !important;
+  background: #0087e0 !important;
+  border-color: #0087e0 !important;
 }
+
 .active .label {
   color: #ffffff !important;
 }
+
 .active .icon {
   filter: brightness(0) invert(1) !important;
 }

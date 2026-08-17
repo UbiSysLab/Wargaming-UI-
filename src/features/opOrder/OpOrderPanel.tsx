@@ -18,10 +18,14 @@ const OPORD_FIELDS: FieldDefinition[] = [
   { key: 'classification', label: 'CLASSIFICATION:', type: 'input' },
   { key: 'dtg', label: 'DTG:', placeholder: 'Date & Time', type: 'input' },
   { key: 'references', label: 'REFERENCES:', placeholder: 'Reference', type: 'input' },
-  { key: 'from', label: 'FROM:', type: 'input' },
-  { key: 'to', label: 'TO:', type: 'input' },
-  { key: 'mission', label: 'MISSION:', type: 'textarea', isDictateable: true, height: '48px' },
-  { key: 'execution', label: 'EXECUTION:', type: 'textarea', isDictateable: true, height: '140px' },
+  { key: 'from', label: 'From:', placeholder: '-', type: 'input' },
+  { key: 'to', label: 'To:', placeholder: '-', type: 'input' },
+  { key: 'enemy', label: 'Enemy:', type: 'textarea', isDictateable: true, height: '56px' },
+  { key: 'own', label: 'Own:', type: 'textarea', isDictateable: true, height: '80px' },
+  { key: 'mission', label: 'MISSION:', type: 'textarea', isDictateable: true, height: '75px' },
+  { key: 'execution', label: 'EXECUTION:', type: 'textarea', isDictateable: true, height: '110px' },
+  { key: 'adminLogistics', label: 'ADMINISTRATION & LOGISTICS:', type: 'textarea', isDictateable: true, height: '75px' },
+  { key: 'commandSignal', label: 'COMMAND & SIGNAL:', type: 'textarea', isDictateable: true, height: '75px' },
 ];
 
 export function OpOrderPanel() {
@@ -48,21 +52,18 @@ export function OpOrderPanel() {
     <div className={styles.panel}>
       <h2 className={styles.title}>Op ORDER (OPORD)</h2>
 
-      {/* Grid container with downward scrollability (overflow-y: auto) */}
+      {/* Grid container with downward scrollability */}
       <div className={styles.grid}>
         {OPORD_FIELDS.map((field) => {
           const isSelected = state.dictationTarget === field.key;
           const isDictateable = field.isDictateable;
-          const showDividerBefore = field.key === 'mission';
+          const showDividerBefore = field.key === 'enemy';
 
           return (
             <React.Fragment key={field.key}>
               {showDividerBefore && <div className={styles.divider} />}
               
-              <div 
-                className={`${styles.row} ${isDictateable ? styles.dictateableRow : ''}`}
-                style={field.type === 'textarea' ? { display: 'flex', flexDirection: 'column', gap: '0.25rem' } : undefined}
-              >
+              <div className={`${styles.row} ${isDictateable ? styles.dictateableRow : ''}`}>
                 <div className={styles.leftContainer}>
                   <label 
                     htmlFor={`opord-${field.key}`}
@@ -70,27 +71,15 @@ export function OpOrderPanel() {
                   >
                     {field.label}
                   </label>
-                  {isDictateable && (
-                    <span 
-                      onClick={() => dispatch({ 
-                        type: 'SET_DICTATION_TARGET', 
-                        payload: isSelected ? 'none' : field.key as DictationTarget 
-                      })}
-                      className={`${styles.micIndicator} ${isSelected ? styles.micActive : ''}`}
-                      title={isSelected ? "Dictation active on this field. Click to disable." : "Click to dictate this field"}
-                    >
-                      🎙️
-                    </span>
-                  )}
                 </div>
 
-                <div className={field.type === 'textarea' ? styles.rightArea : styles.right}>
+                <div className={isDictateable ? styles.rightArea : styles.right}>
                   {field.type === 'textarea' ? (
                     <textarea
                       id={`opord-${field.key}`}
                       className={`${styles.textarea} ${isSelected ? styles.dictationActive : ''}`}
                       style={field.height ? { height: field.height, minHeight: field.height } : undefined}
-                      value={opOrder[field.key]}
+                      value={opOrder[field.key] || ''}
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       onFocus={() => handleFieldSelect(field.key, isDictateable)}
                       placeholder={field.placeholder || ''}
@@ -100,7 +89,7 @@ export function OpOrderPanel() {
                       id={`opord-${field.key}`}
                       type="text"
                       className={`${styles.input} ${isSelected ? styles.dictationActive : ''}`}
-                      value={opOrder[field.key]}
+                      value={opOrder[field.key] || ''}
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       onFocus={() => handleFieldSelect(field.key, isDictateable)}
                       placeholder={field.placeholder || ''}
