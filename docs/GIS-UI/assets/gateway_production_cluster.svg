@@ -1,0 +1,97 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="gwGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="redisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <linearGradient id="workerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#065f46"/>
+    </linearGradient>
+    <linearGradient id="storageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+    <filter id="shadow2" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" rx="12" fill="url(#bg2)"/>
+  
+  <!-- Header -->
+  <text x="450" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#f8fafc" text-anchor="middle">
+    PRODUCTION GIS SERVER: GATEWAY &amp; CLUSTER ARCHITECTURE
+  </text>
+  <text x="450" y="60" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    High-Concurrency Tactical LAN / Air-Gapped Deployment with In-Memory Tile Caching
+  </text>
+
+  <!-- Top Clients -->
+  <g transform="translate(150, 85)" filter="url(#shadow2)">
+    <rect width="600" height="55" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="300" y="24" font-family="sans-serif" font-size="13" font-weight="bold" fill="#38bdf8" text-anchor="middle">TACTICAL LAN CLIENTS (BROWSERS / COMMAND CONSOLES)</text>
+    <text x="300" y="44" font-family="sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">🔵 Blue Team (Planners)  |  🔴 Red Team (Adversary)  |  ⚪ White Cell (Controller/Umpires)</text>
+  </g>
+
+  <!-- Flow Arrow Down -->
+  <path d="M 450 140 L 450 170" stroke="#38bdf8" stroke-width="3"/>
+  <polygon points="445,170 450,180 455,170" fill="#38bdf8"/>
+
+  <!-- API Gateway Box -->
+  <g transform="translate(150, 180)" filter="url(#shadow2)">
+    <rect width="600" height="75" rx="8" fill="url(#gwGrad)" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="300" y="26" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">NGINX / ENVOY API GATEWAY (PORT 80 / 443)</text>
+    <text x="300" y="48" font-family="sans-serif" font-size="11.5" fill="#bfdbfe" text-anchor="middle">🔒 JWT Role-Based Auth (Fog of War)  •  📁 Static React Hosting (/app, /assets)  •  ⚖️ Load Balancing</text>
+    <text x="300" y="66" font-family="sans-serif" font-size="11" fill="#93c5fd" text-anchor="middle">Route: /cog/tiles/*  ➔  Check Cache  ➔  Forward to Workers</text>
+  </g>
+
+  <!-- Split Flow: Cache Hit vs Cache Miss -->
+  <!-- Left: Cache Hit -->
+  <path d="M 300 255 L 300 300" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="4,4"/>
+  <polygon points="295,300 300,310 305,300" fill="#ef4444"/>
+  <text x="240" y="285" font-family="sans-serif" font-size="10.5" font-weight="bold" fill="#f87171">⚡ CACHE HIT (2ms)</text>
+
+  <!-- Right: Cache Miss -->
+  <path d="M 600 255 L 600 300" stroke="#10b981" stroke-width="2.5"/>
+  <polygon points="595,300 600,310 605,300" fill="#10b981"/>
+  <text x="665" y="285" font-family="sans-serif" font-size="10.5" font-weight="bold" fill="#34d399">🔄 CACHE MISS (Render)</text>
+
+  <!-- Redis Cache Box -->
+  <g transform="translate(150, 310)" filter="url(#shadow2)">
+    <rect width="260" height="90" rx="8" fill="url(#redisGrad)" stroke="#f87171" stroke-width="1.5"/>
+    <text x="130" y="26" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">REDIS TILE CACHE</text>
+    <text x="130" y="48" font-family="sans-serif" font-size="11" fill="#fee2e2" text-anchor="middle">In-Memory PNG Tile Store</text>
+    <text x="130" y="68" font-family="sans-serif" font-size="10.5" fill="#fca5a5" text-anchor="middle">Key: tile:{z}:{x}:{y}:{lut}:{filter}</text>
+    <text x="130" y="82" font-family="sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">Returns pre-rendered PNG in &lt;2ms</text>
+  </g>
+
+  <!-- Uvicorn Worker Pool -->
+  <g transform="translate(490, 310)" filter="url(#shadow2)">
+    <rect width="260" height="90" rx="8" fill="url(#workerGrad)" stroke="#34d399" stroke-width="1.5"/>
+    <text x="130" y="26" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">UVICORN / TITILER CLUSTER</text>
+    <text x="130" y="48" font-family="sans-serif" font-size="11" fill="#d1fae5" text-anchor="middle">4-8 FastAPI Worker Processes</text>
+    <text x="130" y="68" font-family="sans-serif" font-size="10.5" fill="#a7f3d0" text-anchor="middle">Dynamic Rescale • Colormap LUTs</text>
+    <text x="130" y="82" font-family="sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">GDAL VSI RAM Cache Enabled</text>
+  </g>
+
+  <!-- Flow from Workers to Storage -->
+  <path d="M 620 400 L 620 440" stroke="#8b5cf6" stroke-width="3"/>
+  <polygon points="615,440 620,450 625,440" fill="#8b5cf6"/>
+
+  <!-- MinIO / Local NVMe Storage -->
+  <g transform="translate(200, 440)" filter="url(#shadow2)">
+    <rect width="500" height="60" rx="8" fill="url(#storageGrad)" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="250" y="24" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">LOCAL MINIO S3 OBJECT STORE / HIGH-SPEED NVME ARRAY</text>
+    <text x="250" y="45" font-family="sans-serif" font-size="11" fill="#ddd6fe" text-anchor="middle">Terabytes of Cloud-Optimized GeoTIFFs (Elevation DEMs, Satellite, Military Bridge Suitability)</text>
+  </g>
+</svg>

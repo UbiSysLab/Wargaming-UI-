@@ -1,9 +1,11 @@
-.container {
+﻿.container {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
   width: 100%;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .brandHeader {
@@ -20,10 +22,275 @@
 
 .mapViewport {
   flex: 1;
-  min-height: 380px;
+  min-height: 520px;
   position: relative;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  background: #0f172a;
+}
+
+.leafletContainer {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Floating QGIS Control Panel */
+.qgisPanel {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.9);
+  border-radius: 8px;
+  width: 320px;
+  max-height: calc(100% - 28px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5);
+  color: #f8fafc;
+}
+
+.panelHeader {
+  padding: 12px 14px;
+  background: rgba(30, 41, 59, 0.9);
+  border-bottom: 1px solid #334155;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panelTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panelBody {
+  padding: 12px 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tabButtons {
+  display: flex;
+  gap: 4px;
+  background: #0f172a;
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tabBtn.active {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.controlRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controlLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selectInput {
+  width: 100%;
+  padding: 7px 9px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 5px;
+  color: #f8fafc;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.selectInput:focus {
+  border-color: #3b82f6;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e293b;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #475569;
+}
+
+.checkboxRow input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.checkboxRow label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #f8fafc;
+  cursor: pointer;
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sliderRow input[type="range"] {
+  flex: 1;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.sliderRow span {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  width: 32px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Identify Tool Box */
+.inspectorBox {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+}
+
+.inspectorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #334155;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.inspectorBadge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.inspectorDesc {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.inspectorCoords {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* Legend Box */
+.legendBox {
+  padding: 8px 10px;
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 6px;
+  border: 1px solid #334155;
+}
+
+.legendTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.legendBar {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #d73027, #fc8d59, #fee08b, #91cf60, #1a9850);
+  margin-bottom: 4px;
+}
+
+.legendLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+/* Mini Toolbar at top-left */
+.toolBarTopLeft {
+  position: absolute;
+  top: 14px;
+  left: 56px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+}
+
+.toolBtn {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #475569;
+  color: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s;
+}
+
+.toolBtn:hover {
+  background: #1e293b;
+  border-color: #3b82f6;
+}
+
+.toolBtn.activeTool {
+  background: #3b82f6;
+  border-color: #2563eb;
+  color: #fff;
 }

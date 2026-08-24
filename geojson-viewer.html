@@ -1,0 +1,488 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoJSON Viewer</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel-bg: #1e293b;
+      --panel-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --err: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .panel {
+      width: 360px;
+      max-width: 100%;
+      height: 100%;
+      background: var(--panel-bg);
+      border-left: 1px solid var(--panel-border);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      z-index: 2;
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-header {
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 12px;
+    }
+
+    .panel-header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .panel-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .field select,
+    .field input[type="url"],
+    .field input[type="text"] {
+      width: 100%;
+      padding: 9px 12px;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field select:focus,
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .sample-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--panel-border);
+      border-radius: 6px;
+      padding: 20px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .dropzone p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .status {
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      word-break: break-word;
+    }
+
+    .status.err {
+      color: var(--err);
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .status.ok {
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .layer-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f172a;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .layer-card input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .layer-card label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: none;
+      color: var(--text);
+      cursor: pointer;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h1>GeoJSON Viewer</h1>
+      <p>Load, visualize, and inspect GeoJSON & Raster layers</p>
+    </div>
+
+    <!-- Preset India Layers Dropdown -->
+    <div class="field">
+      <label for="indiaPresets">India layers (preset)</label>
+      <select id="indiaPresets">
+        <option value="" disabled selected>Select a layer…</option>
+        <option value="https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson">India — States (geohacker)</option>
+        <option value="https://raw.githubusercontent.com/udit-001/india-maps-data/main/geojson/india.geojson">India — States (udit-001)</option>
+        <option value="https://raw.githubusercontent.com/udit-001/india-maps-data/main/states/rajasthan.geojson">Rajasthan — Districts</option>
+      </select>
+    </div>
+
+    <!-- Raster COG Tile Layer Overlay -->
+    <div class="field">
+      <label>Raster Tile Layer (COG)</label>
+      <div class="layer-card">
+        <input type="checkbox" id="cogLayerToggle">
+        <label for="cogLayerToggle">out_cog.tif (TiTiler Server)</label>
+      </div>
+    </div>
+
+    <!-- Fetch from URL -->
+    <div class="field">
+      <label for="urlInput">Fetch from URL</label>
+      <div class="input-group">
+        <input type="url" id="urlInput" placeholder="https://example.com/data.geojson">
+        <button id="fetchBtn" class="btn">Fetch</button>
+      </div>
+    </div>
+
+    <!-- Drag and Drop / File Upload -->
+    <div class="field">
+      <label>Upload GeoJSON File</label>
+      <div id="dropzone" class="dropzone">
+        <p>Drop .geojson / .json file here, or click to browse</p>
+        <input type="file" id="fileInput" accept=".geojson,.json,application/geo+json,application/json" style="display:none">
+      </div>
+    </div>
+
+    <!-- Sample Layers -->
+    <div class="field">
+      <label>Sample Layers</label>
+      <div class="sample-buttons">
+        <button id="samplePointsBtn" class="btn btn-secondary">Cities (Points)</button>
+        <button id="samplePolygonBtn" class="btn btn-secondary">Polygon</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="field">
+      <label>Status</label>
+      <div id="status" class="status">Ready</div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Leaflet Map
+    const map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let currentLayerGroup = L.layerGroup().addTo(map);
+
+    // Raster COG Layer definition
+    const cogTileUrl = 'http://localhost:8001/cog/tiles/{z}/{x}/{y}.png?url=output/out_cog.tif';
+    const cogBounds = [[0.0, 0.0], [2.0, 2.0]]; // [ [south, west], [north, east] ] from gdalinfo
+    let cogLayer = null;
+
+    const cogLayerToggle = document.getElementById('cogLayerToggle');
+    cogLayerToggle.addEventListener('change', function () {
+      if (this.checked) {
+        if (!cogLayer) {
+          cogLayer = L.tileLayer(cogTileUrl, {
+            maxZoom: 19,
+            attribution: '&copy; TiTiler COG'
+          });
+        }
+        map.addLayer(cogLayer);
+        map.fitBounds(cogBounds, { padding: [40, 40] });
+        setStatus('Raster overlay enabled: out_cog.tif (auto-panned to bounds)', 'ok');
+      } else {
+        if (cogLayer && map.hasLayer(cogLayer)) {
+          map.removeLayer(cogLayer);
+        }
+        setStatus('Raster overlay disabled');
+      }
+    });
+
+    function setStatus(message, type) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    function renderGeoJSON(data, label) {
+      currentLayerGroup.clearLayers();
+      try {
+        const geoLayer = L.geoJSON(data, {
+          style: function (feature) {
+            return {
+              color: '#3b82f6',
+              weight: 2,
+              opacity: 0.8,
+              fillColor: '#60a5fa',
+              fillOpacity: 0.35
+            };
+          },
+          onEachFeature: function (feature, layer) {
+            if (feature.properties) {
+              const props = Object.entries(feature.properties)
+                .map(([k, v]) => `<strong>${k}</strong>: ${v}`)
+                .join('<br>');
+              layer.bindPopup(props || 'No properties');
+            }
+          }
+        });
+
+        currentLayerGroup.addLayer(geoLayer);
+        const bounds = geoLayer.getBounds();
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [20, 20] });
+        }
+        setStatus(`Loaded: ${label || 'GeoJSON Layer'}`, 'ok');
+      } catch (err) {
+        setStatus('Render error: ' + err.message, 'err');
+      }
+    }
+
+    // Shared fetch + render helper
+    async function fetchAndRender(url, label) {
+      setStatus('Fetching…');
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText || 'Fetch failed'}`);
+        }
+        const data = await res.json();
+        renderGeoJSON(data, label);
+      } catch (err) {
+        setStatus('Fetch failed: ' + err.message, 'err');
+      }
+    }
+
+    // India Presets change listener
+    const indiaPresets = document.getElementById('indiaPresets');
+    indiaPresets.addEventListener('change', async function () {
+      const url = this.value;
+      if (!url) return;
+      const label = this.options[this.selectedIndex].text;
+      await fetchAndRender(url, label);
+      this.value = '';
+    });
+
+    // Fetch button click listener
+    const fetchBtn = document.getElementById('fetchBtn');
+    const urlInput = document.getElementById('urlInput');
+    fetchBtn.addEventListener('click', async function () {
+      const url = urlInput.value.trim();
+      if (!url) {
+        setStatus('Please enter a URL', 'err');
+        return;
+      }
+      const label = url.split('/').pop() || 'URL Layer';
+      await fetchAndRender(url, label);
+    });
+
+    // Drag-and-drop & File Upload
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      setStatus('Reading file…');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          renderGeoJSON(data, file.name);
+        } catch (err) {
+          setStatus('Invalid JSON: ' + err.message, 'err');
+        }
+      };
+      reader.onerror = () => setStatus('File read error', 'err');
+      reader.readAsText(file);
+    }
+
+    // Sample data buttons
+    document.getElementById('samplePointsBtn').addEventListener('click', () => {
+      const samplePoints = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { name: "New Delhi", country: "India" },
+            geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
+          },
+          {
+            type: "Feature",
+            properties: { name: "Mumbai", country: "India" },
+            geometry: { type: "Point", coordinates: [72.8777, 19.0760] }
+          },
+          {
+            type: "Feature",
+            properties: { name: "Bengaluru", country: "India" },
+            geometry: { type: "Point", coordinates: [77.5946, 12.9716] }
+          }
+        ]
+      };
+      renderGeoJSON(samplePoints, "Sample Cities");
+    });
+
+    document.getElementById('samplePolygonBtn').addEventListener('click', () => {
+      const samplePolygon = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { name: "Sample Region", note: "Demo polygon boundary" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [[
+                [75.0, 25.0],
+                [78.0, 25.0],
+                [78.0, 28.0],
+                [75.0, 28.0],
+                [75.0, 25.0]
+              ]]
+            }
+          }
+        ]
+      };
+      renderGeoJSON(samplePolygon, "Sample Region");
+    });
+  </script>
+</body>
+</html>

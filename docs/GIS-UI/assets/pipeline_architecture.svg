@@ -1,0 +1,153 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="480" rx="12" fill="url(#bgGrad)"/>
+  
+  <!-- Title -->
+  <text x="450" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="1">
+    END-TO-END GEOSPATIAL RASTER &amp; TILING PIPELINE
+  </text>
+  <text x="450" y="66" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    From Raw GeoTIFF to Dynamic Cloud-Optimized Web Tiles in Leaflet / React
+  </text>
+
+  <!-- Stage 1: Raw GeoTIFF -->
+  <g transform="translate(40, 100)" filter="url(#shadow)">
+    <rect width="180" height="310" rx="8" fill="url(#cardGrad1)" stroke="#475569" stroke-width="1.5"/>
+    <rect width="180" height="36" rx="8" fill="url(#amberGrad)"/>
+    <text x="90" y="23" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">1. RAW GEODATA</text>
+    
+    <!-- Icon / Graphic -->
+    <rect x="25" y="55" width="130" height="80" rx="4" fill="#0f172a" stroke="#64748b" stroke-dasharray="3,3"/>
+    <text x="90" y="90" font-family="monospace" font-size="11" fill="#f59e0b" text-anchor="middle">Bridge_Suitability.tif</text>
+    <text x="90" y="110" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">65 MB • 8,141 × 7,869</text>
+
+    <!-- Specs -->
+    <g transform="translate(15, 155)" font-family="sans-serif" font-size="10.5" fill="#cbd5e1">
+      <text x="0" y="0">📦 Format: GeoTIFF</text>
+      <text x="0" y="22">🌐 CRS: EPSG:32643</text>
+      <text x="0" y="44">🔢 Bands: 1 (int8)</text>
+      <text x="0" y="66">🎯 Range: Classes 1 - 5</text>
+      <text x="0" y="88">⚠️ Problem: Slow &amp; Heavy</text>
+      <text x="0" y="105" fill="#ef4444">Cannot stream directly</text>
+    </g>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <g transform="translate(225, 235)">
+    <path d="M 0 0 L 30 0" stroke="#38bdf8" stroke-width="3" stroke-dasharray="4,4"/>
+    <polygon points="30,-6 40,0 30,6" fill="#38bdf8"/>
+    <text x="20" y="-12" font-family="sans-serif" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-weight="bold">rio-cogeo</text>
+  </g>
+
+  <!-- Stage 2: COG Translation -->
+  <g transform="translate(270, 100)" filter="url(#shadow)">
+    <rect width="180" height="310" rx="8" fill="url(#cardGrad1)" stroke="#475569" stroke-width="1.5"/>
+    <rect width="180" height="36" rx="8" fill="url(#blueGrad)"/>
+    <text x="90" y="23" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">2. COG TRANSLATION</text>
+    
+    <!-- Graphic Pyramids -->
+    <rect x="35" y="55" width="110" height="80" rx="4" fill="#0f172a" stroke="#3b82f6"/>
+    <polygon points="90,65 50,125 130,125" fill="#1e3a8a" stroke="#60a5fa"/>
+    <line x1="63" y1="105" x2="117" y2="105" stroke="#93c5fd" stroke-width="1.5"/>
+    <line x1="77" y1="85" x2="103" y2="85" stroke="#93c5fd" stroke-width="1.5"/>
+    <text x="90" y="120" font-family="sans-serif" font-size="8" fill="#e0e7ff" text-anchor="middle">Overviews: 2, 4, 8, 16</text>
+
+    <!-- Specs -->
+    <g transform="translate(15, 155)" font-family="sans-serif" font-size="10.5" fill="#cbd5e1">
+      <text x="0" y="0">🗜️ Lossless DEFLATE</text>
+      <text x="0" y="22">🧱 256×256 Tile Blocks</text>
+      <text x="0" y="44">📑 Front-loaded Header</text>
+      <text x="0" y="66">⚡ Byte-Range Seeking</text>
+      <text x="0" y="88">✅ Validated COG</text>
+      <text x="0" y="105" fill="#10b981">Zero-RAM Footprint</text>
+    </g>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <g transform="translate(455, 235)">
+    <path d="M 0 0 L 30 0" stroke="#38bdf8" stroke-width="3" stroke-dasharray="4,4"/>
+    <polygon points="30,-6 40,0 30,6" fill="#38bdf8"/>
+    <text x="20" y="-12" font-family="sans-serif" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-weight="bold">TiTiler</text>
+  </g>
+
+  <!-- Stage 3: Dynamic Tile Server -->
+  <g transform="translate(500, 100)" filter="url(#shadow)">
+    <rect width="180" height="310" rx="8" fill="url(#cardGrad1)" stroke="#475569" stroke-width="1.5"/>
+    <rect width="180" height="36" rx="8" fill="url(#greenGrad)"/>
+    <text x="90" y="23" font-family="sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">3. TILE SERVER (8001)</text>
+    
+    <!-- Graphic Tile Grid -->
+    <g transform="translate(45, 55)">
+      <rect x="0" y="0" width="40" height="38" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+      <rect x="45" y="0" width="40" height="38" fill="#10b981" opacity="0.8"/>
+      <rect x="0" y="42" width="40" height="38" fill="#10b981" opacity="0.6"/>
+      <rect x="45" y="42" width="40" height="38" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+      <text x="45" y="42" font-family="monospace" font-size="9" fill="#ffffff" text-anchor="middle">PNG Tile</text>
+    </g>
+
+    <!-- Specs -->
+    <g transform="translate(15, 155)" font-family="sans-serif" font-size="10.5" fill="#cbd5e1">
+      <text x="0" y="0">🚀 FastAPI + Uvicorn</text>
+      <text x="0" y="22">🎨 Dynamic LUT Palette</text>
+      <text x="0" y="44">🔍 /api/inspect Probe</text>
+      <text x="0" y="66">🎯 Class Filtering (1-5)</text>
+      <text x="0" y="88">🛡️ TileOutsideBounds</text>
+      <text x="0" y="105" fill="#10b981">15ms Response Time</text>
+    </g>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <g transform="translate(685, 235)">
+    <path d="M 0 0 L 30 0" stroke="#38bdf8" stroke-width="3" stroke-dasharray="4,4"/>
+    <polygon points="30,-6 40,0 30,6" fill="#38bdf8"/>
+    <text x="20" y="-12" font-family="sans-serif" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-weight="bold">Leaflet</text>
+  </g>
+
+  <!-- Stage 4: React UI -->
+  <g transform="translate(730, 100)" filter="url(#shadow)">
+    <rect width="140" height="310" rx="8" fill="url(#cardGrad1)" stroke="#475569" stroke-width="1.5"/>
+    <rect width="140" height="36" rx="8" fill="#6366f1"/>
+    <text x="70" y="23" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">4. REACT 19 UI</text>
+    
+    <!-- Graphic Map View -->
+    <rect x="20" y="55" width="100" height="80" rx="4" fill="#0284c7" opacity="0.3" stroke="#38bdf8"/>
+    <circle cx="70" cy="95" r="14" fill="#10b981" opacity="0.8"/>
+    <circle cx="70" cy="95" r="4" fill="#ffffff"/>
+
+    <!-- Specs -->
+    <g transform="translate(10, 155)" font-family="sans-serif" font-size="10" fill="#cbd5e1">
+      <text x="0" y="0">🗺️ Tactical Map</text>
+      <text x="0" y="22">⚡ Top 5 Sites Jump</text>
+      <text x="0" y="44">🛰️ Basemap Switcher</text>
+      <text x="0" y="66">🎚️ Opacity Slider</text>
+      <text x="0" y="88">📊 Live Legend</text>
+      <text x="0" y="105" fill="#38bdf8">Interactive GIS</text>
+    </g>
+  </g>
+</svg>
