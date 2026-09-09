@@ -56,22 +56,32 @@ export async function discoverAsrServer(): Promise<string> {
   }
 }
 
-export async function transcribeAudio(blob: Blob): Promise<TranscribeResponse> {
+export async function transcribeAudio(fileOrBlob: Blob | File): Promise<TranscribeResponse> {
   const url = await discoverAsrServer();
   const formData = new FormData();
   
-  // Dynamically resolve correct file extension based on actual blob type
-  const mimeType = blob.type.toLowerCase();
-  let extension = 'webm';
-  if (mimeType.includes('mp4') || mimeType.includes('m4a') || mimeType.includes('aac')) {
-    extension = 'mp4';
-  } else if (mimeType.includes('wav')) {
-    extension = 'wav';
-  } else if (mimeType.includes('ogg')) {
-    extension = 'ogg';
+  // Resolve correct filename & extension for audio files
+  let filename = 'recording.webm';
+  if (fileOrBlob instanceof File && fileOrBlob.name) {
+    filename = fileOrBlob.name;
+  } else {
+    const mimeType = (fileOrBlob.type || '').toLowerCase();
+    let extension = 'webm';
+    if (mimeType.includes('m4a') || mimeType.includes('aac')) {
+      extension = 'm4a';
+    } else if (mimeType.includes('wav')) {
+      extension = 'wav';
+    } else if (mimeType.includes('ogg')) {
+      extension = 'ogg';
+    } else if (mimeType.includes('mp3') || mimeType.includes('mpeg')) {
+      extension = 'mp3';
+    } else if (mimeType.includes('webm')) {
+      extension = 'webm';
+    }
+    filename = `recording.${extension}`;
   }
   
-  formData.append('audio_file', blob, `recording.${extension}`);
+  formData.append('audio_file', fileOrBlob, filename);
   formData.append('mode', 'dialogue');
 
   const response = await fetch(url, {

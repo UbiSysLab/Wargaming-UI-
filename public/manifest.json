@@ -1,0 +1,19 @@
+{
+  "name": "Wargaming Suite",
+  "short_name": "Wargaming",
+  "description": "Tactical Audio Simulation & Wargaming Interface",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

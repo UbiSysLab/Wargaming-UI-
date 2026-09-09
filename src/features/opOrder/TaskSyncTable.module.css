@@ -1,0 +1,623 @@
+/* TaskSyncTable.module.css */
+
+.windowCard {
+  width: 100%;
+  max-width: 960px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #d0d7de;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+/* Window Header / Tabs */
+.windowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: #e2e8f0;
+  padding: 6px 10px 0 10px;
+  border-bottom: 1px solid #cbd5e1;
+  user-select: none;
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-bottom: none;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.activeTab {
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  border-color: #cbd5e1;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.tabClose {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.tabClose:hover {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.windowControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 8px;
+  padding-right: 4px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.windowControls span {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.windowControls span:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
+/* Body Content */
+.bodyContent {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+}
+
+/* Top Section */
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.planSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 140px;
+}
+
+.tasksTitle {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0266cc;
+  letter-spacing: -0.01em;
+}
+
+.planSelectorGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.planSelect {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0266cc;
+  border: 1px solid #bfdbfe;
+  background: #f8fafc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.ctgcyLabel, .rowCtgcyLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+
+.ctgcyLabel input, .rowCtgcyLabel input {
+  cursor: pointer;
+  accent-color: #0266cc;
+}
+
+/* Objectives Section */
+.objectivesSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.objectiveRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.objLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  width: 42px;
+}
+
+.objInput {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 0.82rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.objInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.objDeleteBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.objDeleteBtn:hover {
+  color: #ef4444;
+}
+
+.addObjBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: #0266cc;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.addObjBtn span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0266cc;
+  color: #ffffff;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.addObjBtn:hover {
+  text-decoration: underline;
+}
+
+/* Timing Section */
+.timingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 140px;
+}
+
+.timingRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.timeLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  width: 40px;
+}
+
+.timeInput {
+  width: 90px;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  text-align: center;
+  outline: none;
+}
+
+/* Phase Header Bar */
+.phaseBar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  flex-wrap: wrap;
+}
+
+.phaseSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.phaseDropdown {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0266cc;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.phaseNameInput {
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 2px 6px;
+  width: 100px;
+  outline: none;
+}
+
+.phaseTaskFields {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.phaseTaskSelect {
+  font-size: 0.82rem;
+  font-weight: 500;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 2px 6px;
+  outline: none;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.phaseTaskDescInput {
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 2px 6px;
+  width: 130px;
+  outline: none;
+}
+
+.phaseCoords {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.coordRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coordLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.coordInput {
+  width: 65px;
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+}
+
+.coordInputSmall {
+  width: 48px;
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+}
+
+.colorSwatch {
+  width: 28px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.newPhaseBtn {
+  margin-left: auto;
+  background: #0052cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.newPhaseBtn:hover {
+  background: #0747a6;
+}
+
+/* Table */
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.78rem;
+}
+
+.tableToggleIcons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.iconTableActive {
+  color: #0266cc;
+  cursor: pointer;
+}
+
+.iconChart {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.tableRow {
+  border-bottom: 1px dashed #e2e8f0;
+  vertical-align: top;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 8px 10px;
+}
+
+.cellInput {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  background: #ffffff;
+}
+
+.cellSelect {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* Tasks cell stacked layout */
+.taskCellStack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.taskTopLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.taskVerbSelect {
+  flex: 1;
+  padding: 3px 6px;
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  background: #ffffff;
+}
+
+.cellInputDesc {
+  width: 100%;
+  padding: 3px 6px;
+  font-size: 0.76rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  background: #ffffff;
+}
+
+.cellInputExec {
+  width: 100%;
+  padding: 3px 6px;
+  font-size: 0.74rem;
+  font-style: italic;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+  outline: none;
+  background: #fafafa;
+}
+
+/* Time cell stacked layout */
+.timeCellStack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeKindSelect {
+  width: 54px;
+  padding: 3px 4px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  background: #ffffff;
+}
+
+.timeValInput {
+  width: 65px;
+  padding: 3px 4px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+  text-align: center;
+}
+
+/* Loc cell stacked layout */
+.locCellStack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.locRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.locLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  width: 16px;
+}
+
+.locInput {
+  width: 56px;
+  padding: 3px 4px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  outline: none;
+}
+
+/* Row Action Buttons */
+.rowActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.deleteRowBtn, .addRowBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #0266cc;
+  background: #ffffff;
+  color: #0266cc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.deleteRowBtn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.addRowBtn:hover {
+  background: #0266cc;
+  color: #ffffff;
+}

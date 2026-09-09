@@ -15,6 +15,12 @@ interface RecordAudioPanelProps {
 }
 
 const SECTION_LABELS: Record<string, string> = {
+  reportNumber: 'Report Number',
+  classification: 'Classification',
+  dtg: 'DTG',
+  references: 'References',
+  from: 'From',
+  to: 'To',
   enemy: 'Enemy',
   own: 'Own',
   mission: 'Mission',
@@ -172,6 +178,38 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     }
   }, []);
 
+  const handleAudioUpload = async (file: File) => {
+    if (!file) return;
+    setIsTranscribing(true);
+    setError(undefined);
+
+    try {
+      const result = await transcribeAudio(file);
+      const text = result.text.trim();
+      const target = dictationTargetRef.current === 'none' ? 'enemy' : dictationTargetRef.current;
+      dispatch({
+        type: 'UPDATE_STEP_DATA',
+        payload: { step: 'startPreparation', data: { [target]: text } },
+      });
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : 'Audio transcription failed.');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('audio/') || /\.(wav|mp3|m4a|ogg|aac|flac|webm)$/i.test(file.name)) {
+        handleAudioUpload(file);
+      } else {
+        setError('Please drop a valid audio file (.mp3, .wav, .m4a, .ogg, .webm).');
+      }
+    }
+  };
+
   return (
     <div className={styles.panel} aria-label="Record audio panel">
       {/* Header with Section title on Left and Close button on Right */}
@@ -189,8 +227,13 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
         )}
       </div>
 
-      {/* Waveform Card Container */}
-      <div className={styles.waveformContainer}>
+      {/* Waveform Card Container with Drag & Drop Support */}
+      <div 
+        className={styles.waveformContainer}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+        title="Waveform visualizer (or drop audio file here)"
+      >
         {/* Center horizontal baseline line */}
         <div className={styles.baseline} />
         
@@ -201,7 +244,7 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
         <div className={styles.cursorLine} />
       </div>
 
-      {/* Controls row: Rewind 10, Mic button / (Stop + Pause when recording), Forward 10 */}
+      {/* Controls row: Rewind 10, Mic button, Upload Audio button, Forward 10 */}
       <div className={styles.controlsContainer}>
         {/* Rewind 10 Button */}
         <button 
@@ -213,7 +256,7 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
           <img src={tenMinutesBehiend} alt="Rewind 10" className={styles.navSvg} />
         </button>
 
-        {/* Central Record Controls */}
+        {/* Central Record & Upload Controls */}
         <div className={styles.centerButtons}>
           {isRecording ? (
             <>
@@ -244,7 +287,7 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
               className={styles.micButton}
               onClick={handleToggleRecording}
               disabled={isTranscribing}
-              title="Start Recording"
+              title={`Start recording for ${activeSectionLabel}`}
             >
               <img src={recordAudioIcon} alt="Record" className={styles.micIconImg} />
             </button>
@@ -263,7 +306,10 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
       </div>
 
       {isTranscribing && (
-        <p className={styles.statusText}>Transcribing audio...</p>
+        <div className={styles.transcribingBox}>
+          <div className={styles.spinner} />
+          <p className={styles.statusText}>Transcribing audio for {activeSectionLabel}...</p>
+        </div>
       )}
 
       {error ? <p className={styles.errorText}>{error}</p> : null}

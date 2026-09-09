@@ -3,13 +3,21 @@ import { WizardProvider, useWizard } from './stores/WizardContext';
 import { SidePanel } from './components/SidePanel';
 import MainToolbar from './components/MainToolbar';
 import { RecordAudioPanel } from './features/recordAudio/RecordAudioPanel';
+import { DocumentPreviewPanel } from './features/opOrder/DocumentPreviewPanel';
 import { TacticalMapView } from './features/narrative/TacticalMapView';
 import { StepBar } from './components/StepBar';
 import { transcribeAudio } from './features/recordAudio/transcribeApi';
+import { parseOpOrderDocument } from './features/opOrder/documentParser';
+import { EditorScreen } from './features/editor/EditorScreen';
+import { parseOpOrderWithBackend } from './features/opOrder/opOrderApi';
+import { extractTaskSyncFromOpOrder, TaskSyncData } from './features/opOrder/taskSyncExtractor';
 
 function AppContent() {
   const { state, dispatch } = useWizard();
-  const [showRecordPanel, setShowRecordPanel] = useState(true);
+  const [activeCenterView, setActiveCenterView] = useState<'record' | 'document' | 'idle'>('record');
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isGeneratingGraphics, setIsGeneratingGraphics] = useState(false);
+  const [taskSyncData, setTaskSyncData] = useState<TaskSyncData | null>(null);
 
   // Hidden file input refs for native OS file selection
   const loadPlanRef = useRef<HTMLInputElement>(null);
@@ -19,27 +27,33 @@ function AppContent() {
 
   // Active state for the toolbar buttons
   const getActiveButton = (): 'record' | 'upload_audio' | 'upload_document' | 'upload_image' | 'load_plan' | 'none' => {
-    if (showRecordPanel) return 'record';
+    if (activeCenterView === 'record') return 'record';
+    if (activeCenterView === 'document') return 'upload_document';
     return 'none';
   };
 
   // Toggle record audio panel
   const handleRecordAudioClick = () => {
-    const isOpening = !showRecordPanel;
-    setShowRecordPanel(isOpening);
-    if (isOpening) {
+    if (activeCenterView === 'record') {
+      setActiveCenterView('idle');
+      dispatch({ type: 'SET_DICTATION_TARGET', payload: 'none' });
+    } else {
+      setActiveCenterView('record');
       if (state.dictationTarget === 'none') {
         dispatch({ type: 'SET_DICTATION_TARGET', payload: 'enemy' });
       }
-    } else {
-      dispatch({ type: 'SET_DICTATION_TARGET', payload: 'none' });
     }
   };
 
   // Handles closing of the recording panel
   const handleCloseRecordPanel = () => {
-    setShowRecordPanel(false);
+    setActiveCenterView('idle');
     dispatch({ type: 'SET_DICTATION_TARGET', payload: 'none' });
+  };
+
+  // Handles closing of the document preview
+  const handleCloseDocumentPreview = () => {
+    setActiveCenterView('record');
   };
 
   // Native Load Plan Selection (.json)
@@ -119,23 +133,39 @@ function AppContent() {
   };
 
   // Native Upload Plan Document Selection (.pdf, .docx, .doc, .txt)
-  const handleUploadDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadDocumentChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const target = state.dictationTarget === 'none' ? 'enemy' : state.dictationTarget;
-    if (state.dictationTarget === 'none') {
-      dispatch({ type: 'SET_DICTATION_TARGET', payload: target });
-    }
+    try {
+      const parsed = await parseOpOrderDocument(file);
+      const cleanOpOrder = {
+        reportNumber: '',
+        classification: '',
+        dtg: '',
+        references: '',
+        from: '',
+        to: '',
+        enemy: '',
+        own: '',
+        mission: '',
+        execution: '',
+        adminLogistics: '',
+        commandSignal: '',
+        ...parsed.data,
+      };
 
-    const docText = `[Imported Briefing from ${file.name}]:\nSecure Sector Alpha and establish defensive checkpoints. Secure primary supply lines.`;
-    dispatch({
-      type: 'UPDATE_STEP_DATA',
-      payload: {
-        step: 'startPreparation',
-        data: { [target]: docText },
-      },
-    });
+      dispatch({
+        type: 'UPDATE_STEP_DATA',
+        payload: {
+          step: 'startPreparation',
+          data: cleanOpOrder,
+        },
+      });
+      setActiveCenterView('document');
+    } catch (err) {
+      console.error('Failed to parse document', err);
+    }
     event.target.value = '';
   };
 
@@ -178,6 +208,35 @@ function AppContent() {
     });
   };
 
+  // Generate Graphics & Extract Task Sync via API & transition to Tactical Editor
+  const handleGenerateGraphics = async () => {
+    setIsGeneratingGraphics(true);
+    try {
+      const extractedSync = await parseOpOrderWithBackend(state.data.startPreparation);
+      setTaskSyncData(extractedSync);
+    } catch (err) {
+      console.error('Failed to generate graphics via backend', err);
+      setTaskSyncData(extractTaskSyncFromOpOrder(state.data.startPreparation));
+    } finally {
+      setIsGeneratingGraphics(false);
+      setIsEditorOpen(true);
+    }
+  };
+
+  const handleOpenEditor = () => {
+    setTaskSyncData(extractTaskSyncFromOpOrder(state.data.startPreparation));
+    setIsEditorOpen(true);
+  };
+
+  if (isEditorOpen) {
+    return (
+      <EditorScreen 
+        onBack={() => setIsEditorOpen(false)} 
+        initialTaskSyncData={taskSyncData}
+      />
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#eaedf2', overflow: 'hidden', fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
       {/* Light Windows-style Title Bar */}
@@ -212,7 +271,7 @@ function AppContent() {
 
       {/* Main Workspace Layout */}
       <div style={{ display: 'flex', flex: 1, minHeight: 0, padding: '0.75rem 1rem', gap: '1rem' }}>
-        {/* Left Section containing Main View (Map or Toolbar/Recorder) and Steps Navigation */}
+        {/* Left Section containing Main View (Map or Toolbar/Recorder/Document) and Steps Navigation */}
         <main 
           style={{ 
             flex: 1, 
@@ -234,7 +293,9 @@ function AppContent() {
                   activeButton={getActiveButton()}
                   onRecordAudioClick={handleRecordAudioClick} 
                   onUploadAudioClick={() => uploadAudioRef.current?.click()}
-                  onUploadDocumentClick={() => uploadDocumentRef.current?.click()}
+                  onUploadDocumentClick={() => {
+                    uploadDocumentRef.current?.click();
+                  }}
                   onUploadImageClick={() => uploadImageRef.current?.click()}
                   onLoadPlanClick={() => loadPlanRef.current?.click()}
                   onCreatePlanClick={handleCreatePlan}
@@ -244,9 +305,16 @@ function AppContent() {
                 <div style={{ height: '1px', background: '#e2e8f0', margin: '0.75rem 0' }} />
               </div>
 
-              {/* Middle section with Audio Recorder */}
+              {/* Middle section with Audio Recorder OR Document Preview */}
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                {showRecordPanel ? (
+                {activeCenterView === 'document' ? (
+                  <DocumentPreviewPanel 
+                    onClose={handleCloseDocumentPreview} 
+                    onOpenEditor={handleOpenEditor}
+                    onGenerateGraphics={handleGenerateGraphics}
+                    isGenerating={isGeneratingGraphics}
+                  />
+                ) : activeCenterView === 'record' ? (
                   <RecordAudioPanel onClose={handleCloseRecordPanel} />
                 ) : (
                   <div style={{ 
@@ -264,7 +332,7 @@ function AppContent() {
                   }}>
                     <h1 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>Record Audio</h1>
                     <p style={{ margin: 0, maxWidth: '540px', textAlign: 'center', fontSize: '0.88rem' }}>
-                      Click the Record Audio button in the toolbar to open the recorder and capture audio for transcription.
+                      Click the Record Audio button in the toolbar to open the recorder, or click Upload Plan Document to view an OPORD document.
                     </p>
                   </div>
                 )}
@@ -289,7 +357,11 @@ function AppContent() {
           flexDirection: 'column', 
           minHeight: 0 
         }}>
-          <SidePanel />
+          <SidePanel 
+            onOpenEditor={handleOpenEditor} 
+            onGenerateGraphics={handleGenerateGraphics}
+            isGenerating={isGeneratingGraphics}
+          />
         </aside>
       </div>
 
@@ -305,7 +377,7 @@ function AppContent() {
         type="file" 
         ref={uploadAudioRef} 
         style={{ display: 'none' }} 
-        accept="audio/*" 
+        accept="audio/*,.wav,.mp3,.m4a,.ogg,.aac,.flac,.webm" 
         onChange={handleUploadAudioChange} 
       />
       <input 

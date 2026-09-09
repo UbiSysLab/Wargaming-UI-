@@ -20,14 +20,10 @@ const inputStyle: React.CSSProperties = {
 };
 
 export function LoginPanel() {
-  const { state, dispatch } = useWizard();
-  const loginData = state.data.login ?? { username: '' };
+  const [username, setUsername] = React.useState('');
 
   const handleChange = (value: string) => {
-    dispatch({
-      type: 'UPDATE_STEP_DATA',
-      payload: { step: 'login', data: { username: value } },
-    });
+    setUsername(value);
   };
 
   return (
@@ -39,7 +35,7 @@ export function LoginPanel() {
         <input
           id="login-username"
           style={inputStyle}
-          value={loginData.username}
+          value={username}
           onChange={(event) => handleChange(event.target.value)}
           placeholder="Enter username"
         />

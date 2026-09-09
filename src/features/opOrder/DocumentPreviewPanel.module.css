@@ -1,0 +1,153 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  padding: 0.5rem 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.paperSheet {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 380px;
+  overflow-y: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
+}
+
+/* Scrollbar for paper sheet */
+.paperSheet::-webkit-scrollbar {
+  width: 5px;
+}
+
+.paperSheet::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.closeBtn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.documentBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-size: 0.78rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.docRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.docLabel {
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.docValue {
+  color: #334155;
+  font-weight: 500;
+}
+
+.docSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.docSectionHeading {
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.docParagraph {
+  color: #334155;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.docParagraphExecution {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.executionPara {
+  margin: 0;
+  color: #334155;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: #0066cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.15rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.actionBtn:hover {
+  background: #0052a3;
+  transform: translateY(-1px);
+}
+
+.actionBtn:active {
+  transform: translateY(0);
+}

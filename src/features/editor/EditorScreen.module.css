@@ -1,0 +1,481 @@
+/* EditorScreen.module.css - Light Themed to match tactical reference */
+
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: #f1f5f9;
+  color: #0f172a;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+}
+
+/* 1. Top Light Title Bar */
+.topAppBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  height: 38px;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  z-index: 50;
+}
+
+.topAppLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.backBtn:hover {
+  background: #0369a1;
+}
+
+.menuItems {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.menuItem {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.menuItem:hover {
+  color: #0f172a;
+}
+
+.appTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 1rem;
+}
+
+.appTab {
+  padding: 4px 10px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.appTabActive {
+  background: #ffffff;
+  border-color: #0284c7;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+.topAppRight {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.windowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* 2. Secondary Status Ribbon */
+.secondaryRibbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  height: 36px;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+  z-index: 45;
+}
+
+.ribbonLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statLabel {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.statVal {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.statValRed {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.phasePill {
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stepPills {
+  display: flex;
+  gap: 6px;
+  color: #64748b;
+}
+
+.ribbonCenter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.restartBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.ribbonRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blueTimePill {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+/* 3. Command Ribbon */
+.commandRibbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  height: 34px;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+  z-index: 40;
+}
+
+.commandLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cmdBtn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.cmdBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.cmdBtnActive {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.viewModeToggles {
+  display: flex;
+  gap: 2px;
+  background: #e2e8f0;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.viewModeBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.viewModeActive {
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 4. Main Tactical Map Canvas & Workspace */
+.workspace {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #ece5d8;
+}
+
+.mapCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Op Overlay Left Floating Panel */
+.opOverlayPanel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  color: #1e293b;
+  z-index: 20;
+  max-height: calc(100% - 6rem);
+  overflow: hidden;
+}
+
+.opOverlayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.opOverlaySearch {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.opSearchInput {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.opOverlaySubTabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.opSubTab {
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  border-radius: 3px;
+  background: #e2e8f0;
+  color: #475569;
+  cursor: pointer;
+  border: none;
+}
+
+.opSubTabActive {
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.layerTreeList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.treeGroupTitle {
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.treeSubItem {
+  margin-left: 1.25rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+/* Floating Task Sync Container */
+.taskSyncFloatingWrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  width: calc(100% - 320px);
+  max-width: 960px;
+  z-index: 25;
+  max-height: calc(100% - 6rem);
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+/* Bottom Floating Tactical Annotation Toolbar */
+.bottomFloatingToolbar {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 6px 14px;
+  z-index: 30;
+  color: #1e293b;
+}
+
+.toolGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.toolBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.toolBtnActive {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.toolDivider {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+}
+
+.colorPalette {
+  display: flex;
+  gap: 4px;
+}
+
+.colorDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Bottom Status Coordinates Bar */
+.bottomStatusBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  border-top: 1px solid #cbd5e1;
+  padding: 3px 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #475569;
+  z-index: 15;
+}

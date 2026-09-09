@@ -16,7 +16,7 @@ export interface StepDefinition {
   label: string;
 }
 
-export type DictationTarget = 'enemy' | 'own' | 'mission' | 'execution' | 'adminLogistics' | 'commandSignal' | 'none';
+export type DictationTarget = keyof OpOrderData | 'none';
 
 export interface WizardData {
   openingNarrative: NarrativeData;
