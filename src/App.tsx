@@ -208,9 +208,14 @@ function AppContent() {
     });
   };
 
+  const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
+
   // Generate Graphics & Extract Task Sync via API & transition to Tactical Editor
   const handleGenerateGraphics = async () => {
     setIsGeneratingGraphics(true);
+    setIsLoadingWorkspace(true);
+    setIsEditorOpen(true);
+
     try {
       const extractedSync = await parseOpOrderWithBackend(state.data.startPreparation);
       setTaskSyncData(extractedSync);
@@ -219,11 +224,12 @@ function AppContent() {
       setTaskSyncData(extractTaskSyncFromOpOrder(state.data.startPreparation));
     } finally {
       setIsGeneratingGraphics(false);
-      setIsEditorOpen(true);
+      setIsLoadingWorkspace(false);
     }
   };
 
   const handleOpenEditor = () => {
+    setIsLoadingWorkspace(false);
     setTaskSyncData(extractTaskSyncFromOpOrder(state.data.startPreparation));
     setIsEditorOpen(true);
   };
@@ -231,8 +237,12 @@ function AppContent() {
   if (isEditorOpen) {
     return (
       <EditorScreen 
-        onBack={() => setIsEditorOpen(false)} 
+        onBack={() => {
+          setIsEditorOpen(false);
+          setIsLoadingWorkspace(false);
+        }} 
         initialTaskSyncData={taskSyncData}
+        isLoadingWorkspace={isLoadingWorkspace}
       />
     );
   }
@@ -276,6 +286,9 @@ function AppContent() {
           style={{ 
             flex: 1, 
             minHeight: 0, 
+            minWidth: 0,
+            maxWidth: '100%',
+            overflow: 'hidden',
             background: '#ffffff', 
             borderRadius: '6px', 
             border: '1px solid #e2e8f0', 
@@ -306,7 +319,7 @@ function AppContent() {
               </div>
 
               {/* Middle section with Audio Recorder OR Document Preview */}
-              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 {activeCenterView === 'document' ? (
                   <DocumentPreviewPanel 
                     onClose={handleCloseDocumentPreview} 

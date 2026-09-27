@@ -3,6 +3,7 @@ import WaveSurfer from 'wavesurfer.js';
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js';
 import { useWizard } from '../../stores/WizardContext';
 import { transcribeAudio } from './transcribeApi';
+import { postProcessAsrText } from './asrPostProcessor';
 import styles from './RecordAudioPanel.module.css';
 import tenMinutesBehiend from '../../assets/tenMinutesBehiend.svg';
 import tenMinutesAhead from '../../assets/tenMinutesAhead.svg';
@@ -63,7 +64,7 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
       mediaRecorderTimeslice: 1000,
       renderRecordedAudio: true,
       continuousWaveform: true,
-      scrollingWaveform: false,
+      scrollingWaveform: true,
     });
 
     const wavesurfer = WaveSurfer.create({
@@ -71,13 +72,16 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
       backend: 'WebAudio',
       height: 100,
       waveColor: '#1e293b',
-      progressColor: '#1e293b',
+      progressColor: '#0284c7',
       cursorColor: '#0087e0',
-      cursorWidth: 0,
+      cursorWidth: 2,
       barWidth: 2,
       barGap: 3,
       barRadius: 2,
       normalize: true,
+      autoScroll: true,
+      autoCenter: true,
+      minPxPerSec: 50,
       plugins: [recordPlugin],
     });
 
@@ -98,13 +102,18 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
 
       try {
         const result = await transcribeAudio(blob);
-        const text = result.text.trim();
+        const rawText = result.text.trim();
+        const text = postProcessAsrText(rawText);
         
-        // Dispatch text directly to active target (default to enemy if none)
+        // Dispatch text directly to active target (appends into existing text)
         const target = dictationTargetRef.current === 'none' ? 'enemy' : dictationTargetRef.current;
+        const existingVal = (state.data.startPreparation as Record<string, string>)[target] || '';
+        const combinedVal = existingVal.trim() ? `${existingVal.trim()}
+${text}` : text;
+        
         dispatch({
           type: 'UPDATE_STEP_DATA',
-          payload: { step: 'startPreparation', data: { [target]: text } },
+          payload: { step: 'startPreparation', data: { [target]: combinedVal } },
         });
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : 'Transcription failed.');
@@ -182,6 +191,14 @@ export function RecordAudioPanel({ onClose }: RecordAudioPanelProps) {
     if (!file) return;
     setIsTranscribing(true);
     setError(undefined);
+
+    if (wsRef.current) {
+      try {
+        wsRef.current.loadBlob(file);
+      } catch {
+        // Safe fallback
+      }
+    }
 
     try {
       const result = await transcribeAudio(file);

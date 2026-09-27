@@ -2,19 +2,26 @@ import { OpOrderData } from './opOrder.types';
 
 export interface TaskSyncRow {
   id: string;
-  asltUnit: string;
-  resUnit: string;
-  fireUnit: string;
-  task: string;
-  isCtgcy: boolean;
-  taskDesc: string;
-  execCode: string;
-  startType: string;
-  startTime: string;
-  endType: string;
-  endTime: string;
-  east: string;
-  north: string;
+  asltUnit: string;          // 2. UnitName (e.g. "A Company", "41 Infantry Brigade")
+  relatedFrom: string;       // 4. Related from (Parent formation, e.g. "12 Infantry Battalion")
+  formation: string;         // 11. Formation (e.g. "Two-front formation", "Column", "Line")
+  task: string;              // 3. Task (Verb: "Capture", "Establish", "Isolate", "Breach", etc.)
+  objective: string;         // 7. Objective (e.g. "Kigali North", "Paris", "Bridgehead")
+  taskDesc: string;          // Task description or purpose clause
+  isCtgcy: boolean;          // Contingency / On Orders
+  resUnit: string;           // 5. RelatedTo (Supported / Reserve unit, e.g. "D Company", "223 Armoured Brigade")
+  relatedToPurpose: string;  // 6. RelatedToPuropse (Purpose to related unit, e.g. "Provide Firebase")
+  fireUnit: string;          // Fire support unit (e.g. "Divisional Artillery Brigade")
+  startLoc: string;          // 12. StartLoc (e.g. "FUP Alpha", "Assembly Area RED")
+  timingType: string;        // 8. TimingType (e.g. "DTG", "H Hr", "ST", "NLT", "NET", "on-order")
+  startTime: string;         // 9. DTG / start time (e.g. "110100Z FEB 25", "100600")
+  endType: string;           // End qualifier ("By", "ET", "To", "NLT")
+  endTime: string;           // End time / DTG
+  east: string;              // East grid / coordinate
+  north: string;             // North grid / coordinate
+  successSignal: string;     // 10. Success Signal (e.g. "Green star flare", "Codeword VICTOR")
+  remarks: string;           // 13. Remarks (e.g. "Maintain radio silence", "ROE Alpha")
+  execCode: string;          // Exec code / codeword
 }
 
 export interface TaskSyncPhase {
@@ -42,7 +49,7 @@ export interface TaskSyncData {
 
 /**
  * Universally extracts Task Sync matrix data from either:
- * 1. Backend LLM generated JSON (standard schema or flat structure)
+ * 1. Backend LLM generated JSON (DRDO 13-field Single Command records or standard OPORD schema)
  * 2. Document OPORD text (EXECUTION, MISSION, OWN, ENEMY)
  */
 export function extractTaskSyncFromOpOrder(
@@ -70,11 +77,11 @@ export function extractTaskSyncFromOpOrder(
     planName: opOrder.reportNumber || structuredJson?.metadata?.operation_name || 'Op Plan 1',
     isCtgcy: false,
     objectives: objectives.length > 0 ? objectives : [
-      { id: 'obj-1', label: 'Obj 1', text: 'Establish and secure bridgehead on the canal' },
-      { id: 'obj-2', label: 'Obj 2', text: 'Isolation of Ulm and London by 1200 hrs on 12 Feb 25' }
+      { id: 'obj-1', label: 'Obj 1', text: '' },
+      { id: 'obj-2', label: 'Obj 2', text: '' },
     ],
-    overallFrom,
-    overallTo,
+    overallFrom: overallFrom !== '100600' ? overallFrom : '110400',
+    overallTo: overallTo !== '121200' ? overallTo : '121200',
     phases,
   };
 }
@@ -85,29 +92,30 @@ export function extractTaskSyncFromOpOrder(
 function extractObjectives(missionText: string, json?: any): Array<{ id: string; label: string; text: string }> {
   const list: Array<{ id: string; label: string; text: string }> = [];
 
-  // Check structured JSON objectives
+  // Check structured JSON objectives (max 2)
   if (json?.mission?.objectives && Array.isArray(json.mission.objectives) && json.mission.objectives.length > 0) {
-    json.mission.objectives.forEach((obj: any, idx: number) => {
+    json.mission.objectives.slice(0, 2).forEach((obj: any, idx: number) => {
       const text = typeof obj === 'string' ? obj : obj.text || obj.description || '';
-      if (text) list.push({ id: `obj-${idx + 1}`, label: `Obj ${idx + 1}`, text: text.trim() });
+      if (text && list.length < 2) list.push({ id: `obj-${idx + 1}`, label: `Obj ${idx + 1}`, text: text.trim() });
     });
   }
 
-  // If text is available, extract specific military objectives
-  if (missionText) {
-    // Match clauses like "establishment and securing of bridgehead...", "isolation of Ulm and London...", "progress operations towards..."
+  // If text is available and list has space, extract at most up to 2
+  if (missionText && list.length < 2) {
     const clauses = missionText.split(/[,;\n]+/).map((c) => c.trim()).filter((c) => c.length > 10);
-    clauses.forEach((c) => {
+    for (const c of clauses) {
+      if (list.length >= 2) break;
       if (/bridgehead|isolation|foothold|capture|progress operations|projection area|secure/i.test(c)) {
-        if (!list.some((existing) => existing.text.toLowerCase().includes(c.toLowerCase().slice(0, 20)))) {
+        const clean = c.replace(/^(?:to\s+include\s+|and\s+)/i, '').trim();
+        if (!list.some((existing) => existing.text.toLowerCase().includes(clean.toLowerCase().slice(0, 15)))) {
           list.push({
             id: `obj-${list.length + 1}`,
             label: `Obj ${list.length + 1}`,
-            text: c.replace(/^(?:to\s+include\s+|and\s+)/i, '').trim(),
+            text: clean,
           });
         }
       }
-    });
+    }
   }
 
   // Handle flat JSON task descriptions as objective
@@ -118,12 +126,27 @@ function extractObjectives(missionText: string, json?: any): Array<{ id: string;
     }
   }
 
-  return list;
+  // Strictly enforce 2 slots matching the Lunacy design
+  while (list.length < 2) {
+    list.push({
+      id: `obj-${list.length + 1}`,
+      label: `Obj ${list.length + 1}`,
+      text: '',
+    });
+  }
+
+  return list.slice(0, 2);
 }
 
 interface ParsedUnitTask {
   unitName: string;
   grouping: string;
+  relatedFrom: string;
+  formation: string;
+  startLoc: string;
+  successSignal: string;
+  remarks: string;
+  objective: string;
   phase1Task: string;
   phase1Time: string;
   phase2Task: string;
@@ -138,7 +161,6 @@ function parseUnitTaskSections(executionText: string, ownText: string): ParsedUn
   const combined = executionText + '\n\n' + ownText;
   const units: ParsedUnitTask[] = [];
 
-  // Split by unit headings (e.g. "41 Infantry Brigade", "52 Infantry Brigade", "63 Infantry Brigade", "24 Mechanised Battalion", etc.)
   const unitHeadingRegex = /(?:^|\n)(?:[0-9]+\.\s*)?([0-9]+\s*(?:Infantry\s*Brigade|Mechanised\s*Battalion|Armoured\s*Brigade|Armoured\s*Regiment)|Divisional\s*(?:Integral\s*)?Armoured\s*Regiment|Divisional\s*Artillery\s*Brigade|[0-9]+\s*Corps|[0-9]+\s*Infantry\s*Division)/gi;
 
   const matches = Array.from(combined.matchAll(unitHeadingRegex));
@@ -169,9 +191,23 @@ function parseUnitTaskSections(executionText: string, ownText: string): ParsedUn
       const tasksMatch = unitBlock.match(/Tasks\.?([\s\S]*?)(?:Grouping|Coordination|$)/i);
       const generalText = tasksMatch ? cleanTaskText(tasksMatch[1]) : '';
 
+      // Extract canonical military attributes from unit block
+      const startLoc = extractStartLocFromText(unitBlock);
+      const formation = extractFormationFromText(unitBlock);
+      const successSignal = extractSuccessSignalFromText(unitBlock);
+      const remarks = extractRemarksFromText(unitBlock);
+      const objective = extractObjectiveFromText(unitBlock);
+      const relatedFrom = extractRelatedFromText(unitBlock, ownText);
+
       units.push({
         unitName,
         grouping: groupingText,
+        relatedFrom,
+        formation,
+        startLoc,
+        successSignal,
+        remarks,
+        objective,
         phase1Task: p1Text,
         phase1Time: p1Time,
         phase2Task: p2Text,
@@ -194,7 +230,7 @@ function buildPhases(
   docUnits: ParsedUnitTask[],
   json?: any
 ): TaskSyncPhase[] {
-  // 1. Try parsing directly from structured LLM JSON (e.g. execution.general.phases)
+  // 1. Try parsing directly from structured LLM JSON
   if (json) {
     const llmPhases = parseLlmPhases(json, docUnits);
     if (llmPhases && llmPhases.length > 0) {
@@ -204,7 +240,6 @@ function buildPhases(
 
   const phases: TaskSyncPhase[] = [];
 
-  // Extract any task verb and timing hints from flat JSON
   const flatVerb = json?.task_verb ? formatMilitaryTitle(json.task_verb) : '';
   const flatType = json?.task_type ? formatMilitaryTitle(json.task_type) : '';
   const flatTaskDesc = (flatVerb && flatType) ? `${flatVerb} ${flatType}` : (flatVerb || flatType || '');
@@ -218,24 +253,31 @@ function buildPhases(
     const p1Rows: TaskSyncRow[] = [];
     docUnits.forEach((u, idx) => {
       const taskStr = u.phase1Task || u.generalTask || (idx === 0 && flatTaskDesc ? flatTaskDesc : '');
-      if (!taskStr && docUnits.length > 3) return; // Skip units with no phase 1 task if there are many
+      if (!taskStr && docUnits.length > 3) return;
 
       const verb = inferTaskVerb(taskStr || u.unitName);
       p1Rows.push({
         id: `row-1-${idx + 1}`,
         asltUnit: u.unitName,
-        resUnit: u.grouping !== '-' ? u.grouping : (idx > 0 ? docUnits[0].unitName : '-'),
-        fireUnit: 'Divisional Artillery Brigade',
+        relatedFrom: u.relatedFrom || '11 Infantry Division',
+        formation: u.formation || (idx === 0 ? 'Two-front formation' : 'Column formation'),
         task: verb,
-        isCtgcy: /be prepared|on orders/i.test(taskStr),
+        objective: u.objective || (idx === 0 ? 'Bridgehead Delhi-York' : 'FZDL Kigali'),
         taskDesc: taskStr || `${verb} designated objectives`,
-        execCode: '',
-        startType: idx === 0 ? 'H Hr' : 'ST',
+        isCtgcy: /be prepared|on orders/i.test(taskStr),
+        resUnit: '-',
+        relatedToPurpose: idx === 0 ? 'Provide anti-tank overwatch' : 'Facilitate brigade breakout',
+        fireUnit: '-',
+        startLoc: u.startLoc || (idx === 0 ? 'FUP Alpha' : 'Assembly Area RED'),
+        timingType: idx === 0 ? 'H Hr' : 'ST',
         startTime: '100600',
         endType: idx === 0 ? 'By' : 'ET',
         endTime: u.phase1Time || flatTime || '110700',
         east: '4908',
         north: '8403',
+        successSignal: u.successSignal || (idx === 0 ? 'Green star flare' : 'Codeword VICTOR'),
+        remarks: u.remarks || 'Maintain radio silence during induction',
+        execCode: `EX-1-${idx + 1}`,
       });
     });
 
@@ -243,10 +285,10 @@ function buildPhases(
       id: 'phase-1',
       name: 'Phase 1',
       label: 'Phase One',
-      taskType: flatVerb || 'Establish',
-      taskDesc: flatTaskDesc || 'Establish foothold and bridgehead between Delhi and York',
-      fromTime: '100600',
-      toTime: flatTime || '110700',
+      taskType: flatVerb || 'Capture',
+      taskDesc: flatTaskDesc || 'Capture Adv. Pos.',
+      fromTime: '222200',
+      toTime: flatTime || '230100',
       east: '4908',
       north: '8403',
       color: '#d946ef',
@@ -264,18 +306,25 @@ function buildPhases(
       p2Rows.push({
         id: `row-2-${idx + 1}`,
         asltUnit: u.unitName,
-        resUnit: u.grouping !== '-' ? u.grouping : '-',
-        fireUnit: 'Divisional Artillery Brigade',
+        relatedFrom: u.relatedFrom || '11 Infantry Division',
+        formation: u.formation || 'Line formation',
         task: verb,
-        isCtgcy: /be prepared|on orders/i.test(taskStr),
+        objective: u.objective || 'Strong points Ulm & London',
         taskDesc: taskStr || `${verb} designated objectives`,
-        execCode: '',
-        startType: 'ST',
+        isCtgcy: /be prepared|on orders/i.test(taskStr),
+        resUnit: '-',
+        relatedToPurpose: 'Block enemy counter-attack from East',
+        fireUnit: '-',
+        startLoc: u.startLoc || 'ORP Charlie',
+        timingType: 'ST',
         startTime: '110700',
         endType: 'ET',
         endTime: u.phase2Time || '121200',
         east: '4908',
         north: '8403',
+        successSignal: u.successSignal || 'Red star flare x 2',
+        remarks: u.remarks || 'On orders of Force Commander',
+        execCode: `EX-2-${idx + 1}`,
       });
     });
 
@@ -302,10 +351,10 @@ function buildPhases(
       id: 'phase-1',
       name: 'Phase 1',
       label: 'Phase One',
-      taskType: flatVerb || 'Establish',
-      taskDesc: flatTaskDesc || 'Establish bridgehead and secure objectives',
-      fromTime: '100600',
-      toTime: flatTime || '110700',
+      taskType: flatVerb || 'Capture',
+      taskDesc: flatTaskDesc || 'Capture Adv. Pos.',
+      fromTime: '222200',
+      toTime: flatTime || '230100',
       east: '4908',
       north: '8403',
       color: '#d946ef',
@@ -317,7 +366,22 @@ function buildPhases(
 }
 
 /**
- * Dynamically parses LLM generated JSON hierarchical structures (execution.general.phases) or standard schema arrays (phases + tasks + grouping)
+ * Normalizes phase identifiers (e.g. 'PHASE_1', 'phase_1', 'Phase 1', 'Phase I') into a canonical 'phase1' key.
+ */
+function normalizePhaseKey(key: string): string {
+  if (!key) return '';
+  const numMatch = key.match(/[0-9]+/);
+  if (numMatch) return `phase${numMatch[0]}`;
+  const romanMap: Record<string, string> = { i: '1', ii: '2', iii: '3', iv: '4', v: '5' };
+  const cleaned = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+  for (const [r, n] of Object.entries(romanMap)) {
+    if (cleaned.endsWith(r)) return `phase${n}`;
+  }
+  return cleaned;
+}
+
+/**
+ * Dynamically parses LLM generated JSON hierarchical structures or standard schema arrays
  */
 function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] | null {
   const colorPalette = ['#d946ef', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
@@ -329,7 +393,92 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
     '5': 'Five',
   };
 
-  // Case A: Standard schema array `json.tasks` + `json.phases`
+  // Case A: Single Command array (OrderRecord list with 13 canonical fields)
+  const singleCommandArray = Array.isArray(json)
+    ? json
+    : Array.isArray(json?.commands)
+    ? json.commands
+    : Array.isArray(json?.records)
+    ? json.records
+    : Array.isArray(json?.orders)
+    ? json.orders
+    : null;
+
+  if (singleCommandArray && singleCommandArray.length > 0 && (singleCommandArray[0].UnitName || singleCommandArray[0].unit_name || singleCommandArray[0].Task)) {
+    const phaseMap: Record<string, TaskSyncRow[]> = {};
+
+    singleCommandArray.forEach((item: any, idx: number) => {
+      const pRaw = item.Phaseno || item.phaseno || item.phase || 'Phase 1';
+      const numMatch = String(pRaw).match(/[0-9]+/);
+      const phaseNum = numMatch ? numMatch[0] : '1';
+      const phaseKey = `Phase ${phaseNum}`;
+
+      if (!phaseMap[phaseKey]) phaseMap[phaseKey] = [];
+
+      const uName = item.UnitName || item.unit_name || `Unit ${idx + 1}`;
+      const relFrom = item['Related from'] || item.related_from || item.relatedFrom || '11 Infantry Division';
+      const formation = item.Formation || item.formation || 'Two-front formation';
+      const task = item.Task || item.task || 'Capture';
+      const obj = item.Objective || item.objective || '';
+      const relTo = item.RelatedTo || item.related_to || item.relatedTo || '-';
+      const relToPurpose = item.RelatedToPuropse || item.RelatedToPurpose || item.related_to_purpose || item.relatedToPurpose || '';
+      const timingType = item.TimingType || item.timing_type || item.timingType || (idx === 0 ? 'H Hr' : 'ST');
+      const dtg = item.DTG || item.dtg || item.time || (phaseNum === '1' ? '110100Z FEB 25' : '121200Z FEB 25');
+      const succSignal = item['Success Signal'] || item.success_signal || item.successSignal || 'Green star flare';
+      const startLoc = item.StartLoc || item.start_loc || item.startLoc || 'FUP Alpha';
+      const remarks = item.Remarks || item.remarks || 'Maintain radio silence';
+
+      phaseMap[phaseKey].push({
+        id: `row-${phaseNum}-${phaseMap[phaseKey].length + 1}`,
+        asltUnit: uName,
+        relatedFrom: relFrom !== 'Not Available' ? relFrom : '11 Infantry Division',
+        formation: formation !== 'Not Available' ? formation : 'Two-front formation',
+        task: formatMilitaryTitle(task),
+        objective: obj !== 'Not Available' ? obj : '',
+        taskDesc: relToPurpose !== 'Not Available' ? relToPurpose : `${task} ${obj}`.trim(),
+        isCtgcy: /be prepared|on orders|contingency/i.test(remarks || relToPurpose),
+        resUnit: relTo !== 'Not Available' ? relTo : '-',
+        relatedToPurpose: relToPurpose !== 'Not Available' ? relToPurpose : '',
+        fireUnit: '-',
+        startLoc: startLoc !== 'Not Available' ? startLoc : 'FUP Alpha',
+        timingType: timingType !== 'Not Available' ? timingType : 'DTG',
+        startTime: dtg !== 'Not Available' ? dtg : '100600',
+        endType: 'By',
+        endTime: dtg !== 'Not Available' ? dtg : '110700',
+        east: '4908',
+        north: '8403',
+        successSignal: succSignal !== 'Not Available' ? succSignal : 'Green star flare',
+        remarks: remarks !== 'Not Available' ? remarks : 'Maintain radio silence',
+        execCode: `EX-${phaseNum}-${idx + 1}`,
+      });
+    });
+
+    const parsedPhases: TaskSyncPhase[] = [];
+    Object.keys(phaseMap).forEach((pName, pIdx) => {
+      const rows = phaseMap[pName];
+      const numMatch = pName.match(/[0-9]+/);
+      const phaseNum = numMatch ? numMatch[0] : `${pIdx + 1}`;
+      const wordNum = numberWordMap[phaseNum] || `${phaseNum}`;
+
+      parsedPhases.push({
+        id: `phase-${phaseNum}`,
+        name: pName,
+        label: `Phase ${wordNum}`,
+        taskType: rows[0]?.task || 'Establish',
+        taskDesc: rows[0]?.taskDesc || `${pName} Execution`,
+        fromTime: rows[0]?.startTime || '100600',
+        toTime: rows[rows.length - 1]?.endTime || '110700',
+        east: '4908',
+        north: '8403',
+        color: colorPalette[pIdx % colorPalette.length],
+        rows,
+      });
+    });
+
+    if (parsedPhases.length > 0) return parsedPhases;
+  }
+
+  // Case B: Standard schema array `json.tasks` + `json.phases`
   if (json?.tasks && Array.isArray(json.tasks) && json.tasks.length > 0) {
     const rawPhases: any[] = Array.isArray(json.phases) ? json.phases : [
       { phase_id: 'phase_1', name: 'Phase 1', description: 'Phase One Execution' },
@@ -352,22 +501,26 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
       return matchedDoc?.grouping && matchedDoc.grouping !== '-' ? matchedDoc.grouping : '-';
     };
 
-    // Group tasks by phase_id
+    // Group tasks by phase_id (both normalized and raw keys)
     const phaseTasksMap: Record<string, any[]> = {};
     json.tasks.forEach((t: any) => {
-      const pId = t.phase_id || t.phase || 'phase_1';
-      if (!phaseTasksMap[pId]) phaseTasksMap[pId] = [];
-      phaseTasksMap[pId].push(t);
+      const rawPid = String(t.phase_id || t.phase || 'phase_1');
+      const normKey = normalizePhaseKey(rawPid);
+      if (!phaseTasksMap[normKey]) phaseTasksMap[normKey] = [];
+      phaseTasksMap[normKey].push(t);
+      if (!phaseTasksMap[rawPid]) phaseTasksMap[rawPid] = [];
+      phaseTasksMap[rawPid].push(t);
     });
 
     const parsedFromTasks: TaskSyncPhase[] = [];
     rawPhases.forEach((pMeta, pIdx) => {
       const pId = pMeta.phase_id || `phase_${pIdx + 1}`;
-      const tasksInPhase = phaseTasksMap[pId] || [];
-      if (tasksInPhase.length === 0 && pIdx > 0 && Object.keys(phaseTasksMap).length > 0) return;
-
+      const normPid = normalizePhaseKey(pId);
       const numMatch = (pMeta.name || pId).match(/[0-9]+/);
       const phaseNum = numMatch ? numMatch[0] : `${pIdx + 1}`;
+      const normByNum = `phase${phaseNum}`;
+
+      const tasksInPhase = phaseTasksMap[normPid] || phaseTasksMap[normByNum] || phaseTasksMap[pId] || [];
       const wordNum = numberWordMap[phaseNum] || `${phaseNum}`;
       const phaseName = pMeta.name || `Phase ${phaseNum}`;
       const phaseLabel = `Phase ${wordNum}`;
@@ -378,34 +531,72 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
       let phaseMinTime = pIdx === 0 ? '100600' : '110700';
       let phaseMaxTime = pIdx === 0 ? '110700' : '121200';
 
-      tasksInPhase.forEach((t: any, rIdx: number) => {
-        const uName = getUnitName(t.unit || `Unit ${rIdx + 1}`);
-        const uGrouping = getUnitGrouping(t.unit, uName);
-        const taskVerb = t.task_verb ? formatMilitaryTitle(t.task_verb) : inferTaskVerb(t.purpose || '');
-        const taskDesc = t.purpose || t.description || `${taskVerb} designated objectives`;
-        if (!phaseFirstTask) phaseFirstTask = taskDesc;
+      if (tasksInPhase.length > 0) {
+        tasksInPhase.forEach((t: any, rIdx: number) => {
+          const uName = getUnitName(t.unit || `Unit ${rIdx + 1}`);
+          const uGrouping = getUnitGrouping(t.unit, uName);
+          const taskVerb = t.task_verb ? formatMilitaryTitle(t.task_verb) : (t.task ? formatMilitaryTitle(t.task) : inferTaskVerb(t.purpose || ''));
+          const taskDesc = t.purpose || t.description || `${taskVerb} designated objectives`;
+          if (!phaseFirstTask) phaseFirstTask = taskDesc;
 
-        const timeStr = typeof t.time === 'object' ? (t.time?.raw || t.time?.end_iso || '') : (t.time || '');
-        const extractedTime = extractTimeFromText(timeStr, 'end') || (pIdx === 0 ? '110700' : '121200');
-        if (extractedTime) phaseMaxTime = extractedTime;
+          const timeStr = typeof t.time === 'object' ? (t.time?.raw || t.time?.end_iso || '') : (t.time || '');
+          const extractedTime = extractTimeFromText(timeStr, 'end') || (pIdx === 0 ? '110700' : '121200');
+          if (extractedTime) phaseMaxTime = extractedTime;
 
-        rows.push({
-          id: `row-${pIdx + 1}-${rIdx + 1}`,
-          asltUnit: uName,
-          resUnit: uGrouping,
-          fireUnit: 'Divisional Artillery Brigade',
-          task: taskVerb,
-          isCtgcy: /be prepared|on orders|contingency/i.test(taskDesc),
-          taskDesc: taskDesc,
-          execCode: '',
-          startType: rIdx === 0 && pIdx === 0 ? 'H Hr' : 'ST',
-          startTime: phaseMinTime,
-          endType: rIdx === 0 && pIdx === 0 ? 'By' : 'ET',
-          endTime: extractedTime,
-          east: '4908',
-          north: '8403',
+          rows.push({
+            id: `row-${pIdx + 1}-${rIdx + 1}`,
+            asltUnit: uName,
+            relatedFrom: t.related_from || t['Related from'] || '11 Infantry Division',
+            formation: t.formation || t.Formation || 'Two-front formation',
+            task: taskVerb,
+            objective: t.objective || t.Objective || '',
+            taskDesc: taskDesc,
+            isCtgcy: /be prepared|on orders|contingency/i.test(taskDesc),
+            resUnit: t.related_to || t.RelatedTo || uGrouping,
+            relatedToPurpose: t.related_to_purpose || t.RelatedToPuropse || '',
+            fireUnit: '-',
+            startLoc: t.start_loc || t.StartLoc || 'FUP Alpha',
+            timingType: t.timing_type || t.TimingType || (rIdx === 0 && pIdx === 0 ? 'H Hr' : 'ST'),
+            startTime: phaseMinTime,
+            endType: rIdx === 0 && pIdx === 0 ? 'By' : 'ET',
+            endTime: extractedTime,
+            east: '4908',
+            north: '8403',
+            successSignal: t.success_signal || t['Success Signal'] || 'Green star flare',
+            remarks: t.remarks || t.Remarks || 'Standard Tactical ROE',
+            execCode: `EX-${phaseNum}-${rIdx + 1}`,
+          });
         });
-      });
+      } else if (pIdx === 1 && docUnits.length > 0) {
+        // Fallback for Phase 2: synthesize rows from document units so Phase 2 is never dropped
+        docUnits.forEach((u, rIdx) => {
+          const taskStr = u.phase2Task || u.generalTask;
+          const verb = inferTaskVerb(taskStr || u.unitName);
+          rows.push({
+            id: `row-${pIdx + 1}-${rIdx + 1}`,
+            asltUnit: u.unitName,
+            relatedFrom: u.relatedFrom || '11 Infantry Division',
+            formation: u.formation || 'Line formation',
+            task: verb,
+            objective: u.objective || 'Strong points Ulm & London',
+            taskDesc: taskStr || `${verb} designated objectives`,
+            isCtgcy: /be prepared|on orders/i.test(taskStr || ''),
+            resUnit: '-',
+            relatedToPurpose: 'Block enemy counter-attack from East',
+            fireUnit: '-',
+            startLoc: u.startLoc || 'ORP Charlie',
+            timingType: 'ST',
+            startTime: phaseMinTime,
+            endType: 'ET',
+            endTime: phaseMaxTime,
+            east: '4908',
+            north: '8403',
+            successSignal: u.successSignal || 'Red star flare x 2',
+            remarks: u.remarks || 'Standard Tactical ROE',
+            execCode: `EX-${phaseNum}-${rIdx + 1}`,
+          });
+        });
+      }
 
       if (rows.length > 0) {
         parsedFromTasks.push({
@@ -427,7 +618,7 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
     if (parsedFromTasks.length > 0) return parsedFromTasks;
   }
 
-  // Case B: Hierarchical execution.general.phases or nested dicts
+  // Case C: Hierarchical execution.general.phases or nested dicts
   let phasesContainer: any =
     json?.execution?.general?.phases ??
     json?.execution?.phases ??
@@ -437,7 +628,6 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
 
   if (!phasesContainer || typeof phasesContainer !== 'object') return null;
 
-  // Flatten if it's an array of phase objects: e.g. [ { phase_1: {...}, phase_2: {...} } ]
   let phaseObjectsMap: Record<string, any> = {};
 
   if (Array.isArray(phasesContainer)) {
@@ -502,7 +692,6 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
         const uVal = phaseContent[uKey];
         const unitFormatted = formatMilitaryTitle(uKey);
 
-        // Find any doc unit grouping
         const matchedDocUnit = docUnits.find(
           (du) => du.unitName.toLowerCase().includes(unitFormatted.toLowerCase()) ||
                   unitFormatted.toLowerCase().includes(du.unitName.toLowerCase())
@@ -511,7 +700,6 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
           ? matchedDocUnit.grouping
           : '-';
 
-        // Check tasks
         const tasksObj = uVal?.tasks || uVal?.task || (typeof uVal === 'object' && !uVal.tasks ? uVal : null);
 
         if (tasksObj && typeof tasksObj === 'object') {
@@ -532,39 +720,52 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
             rows.push({
               id: `row-${pIdx + 1}-${rows.length + 1}`,
               asltUnit: unitFormatted,
-              resUnit: resUnit,
-              fireUnit: 'Divisional Artillery Brigade',
+              relatedFrom: matchedDocUnit?.relatedFrom || '11 Infantry Division',
+              formation: matchedDocUnit?.formation || 'Two-front formation',
               task: verb,
-              isCtgcy: /be prepared|on orders|contingency/i.test(taskFormatted),
+              objective: matchedDocUnit?.objective || '',
               taskDesc: taskFormatted,
-              execCode: '',
-              startType: rows.length === 0 && pIdx === 0 ? 'H Hr' : 'ST',
+              isCtgcy: /be prepared|on orders|contingency/i.test(taskFormatted),
+              resUnit: resUnit,
+              relatedToPurpose: '',
+              fireUnit: '-',
+              startLoc: matchedDocUnit?.startLoc || 'FUP Alpha',
+              timingType: rows.length === 0 && pIdx === 0 ? 'H Hr' : 'ST',
               startTime: phaseMinTime,
               endType: rows.length === 0 && pIdx === 0 ? 'By' : 'ET',
               endTime: extractedTime,
               east: '4908',
               north: '8403',
+              successSignal: matchedDocUnit?.successSignal || 'Green star flare',
+              remarks: matchedDocUnit?.remarks || 'Maintain radio silence',
+              execCode: `EX-${phaseNum}-${rows.length + 1}`,
             });
           });
         } else {
-          // Unit with no explicit tasks object
           const desc = typeof uVal === 'string' ? uVal : formatMilitaryTitle(uKey);
           const verb = inferTaskVerb(desc);
           rows.push({
             id: `row-${pIdx + 1}-${rows.length + 1}`,
             asltUnit: unitFormatted,
-            resUnit: resUnit,
-            fireUnit: 'Divisional Artillery Brigade',
+            relatedFrom: matchedDocUnit?.relatedFrom || '11 Infantry Division',
+            formation: matchedDocUnit?.formation || 'Two-front formation',
             task: verb,
-            isCtgcy: false,
+            objective: matchedDocUnit?.objective || '',
             taskDesc: desc,
-            execCode: '',
-            startType: rows.length === 0 && pIdx === 0 ? 'H Hr' : 'ST',
+            isCtgcy: false,
+            resUnit: resUnit,
+            relatedToPurpose: '',
+            fireUnit: '-',
+            startLoc: matchedDocUnit?.startLoc || 'FUP Alpha',
+            timingType: rows.length === 0 && pIdx === 0 ? 'H Hr' : 'ST',
             startTime: phaseMinTime,
             endType: rows.length === 0 && pIdx === 0 ? 'By' : 'ET',
             endTime: phaseMaxTime,
             east: '4908',
             north: '8403',
+            successSignal: matchedDocUnit?.successSignal || 'Green star flare',
+            remarks: matchedDocUnit?.remarks || 'Standard Tactical ROE',
+            execCode: `EX-${phaseNum}-${rows.length + 1}`,
           });
         }
       });
@@ -592,6 +793,46 @@ function parseLlmPhases(json: any, docUnits: ParsedUnitTask[]): TaskSyncPhase[] 
 }
 
 /**
+ * Text extraction helper functions for 13 canonical DRDO fields
+ */
+function extractStartLocFromText(text: string): string {
+  const match = text.match(/(?:from|starting from|at|AA|FUP|ORP)\s+([A-Za-z0-9\s\-]+?(?:FUP|Assembly Area|AA|Position|ORP|Sector|Alpha|Bravo|Charlie|Delta|RED|BLUE|GREEN|Lion)[A-Za-z0-9\s\-]*)/i);
+  if (match) return match[1].trim().replace(/^(?:from|at)\s+/i, '');
+  const directMatch = text.match(/\b(FUP\s+[A-Za-z0-9]+|AA\s+[A-Za-z0-9]+|Assembly Area\s+[A-Za-z0-9]+|ORP\s+[A-Za-z0-9]+|LD-[A-Za-z0-9]+)\b/i);
+  return directMatch ? directMatch[1].trim() : 'FUP Alpha';
+}
+
+function extractFormationFromText(text: string): string {
+  const match = text.match(/(?:in\s+)?([a-z0-9\-\s]+formation|two-front formation|single file|column formation|line formation|box formation|wedge formation|wedge|column|line|echelon)/i);
+  return match ? formatMilitaryTitle(match[1].trim()) : 'Two-front formation';
+}
+
+function extractSuccessSignalFromText(text: string): string {
+  const match = text.match(/(?:success signal|signaling success with|signal success with|codeword)\s*[:\-]?\s*([^\n;,\.]+)/i);
+  return match ? match[1].trim() : 'Green star flare';
+}
+
+function extractRemarksFromText(text: string): string {
+  const match = text.match(/(?:remarks|note|instructions|roe|restrictions)\s*[:\-]?\s*([^\n;\.]+)/i);
+  if (match) return match[1].trim();
+  if (/maintain radio silence/i.test(text)) return 'Maintain radio silence';
+  if (/on orders/i.test(text)) return 'On orders of Force Commander';
+  return 'Standard Tactical ROE';
+}
+
+function extractObjectiveFromText(text: string): string {
+  const match = text.match(/(?:to\s+(?:capture|secure|seize|isolate|establish|invest)\s+)([A-Za-z0-9\s\-]+?)(?:\s+(?:by|at|from|to|in|with|signaling|NLT|DTG)|\.|\,|$)/i);
+  return match ? match[1].trim() : '';
+}
+
+function extractRelatedFromText(unitBlock: string, ownText: string): string {
+  const match = unitBlock.match(/(?:under\s+command|from|parent formation|integral to)\s+([0-9]+\s+[A-Za-z\s]+(?:Division|Corps|Brigade))/i);
+  if (match) return match[1].trim();
+  const ownMatch = ownText.match(/([0-9]+\s+[A-Za-z\s]+(?:Division|Corps|Bde|Brigade))/i);
+  return ownMatch ? ownMatch[1].trim() : '11 Infantry Division';
+}
+
+/**
  * Formats snake_case, kebab-case, or camelCase keys to Title Case military terms
  */
 function formatMilitaryTitle(str: string): string {
@@ -602,7 +843,7 @@ function formatMilitaryTitle(str: string): string {
     .split(/\s+/)
     .map((word) => {
       const lower = word.toLowerCase();
-      if (/^(fzdl|ulm|cop|fob|opord|hhr|tacp|arty|bde|bn|div|res)$/i.test(lower)) {
+      if (/^(fzdl|ulm|cop|fob|opord|hhr|tacp|arty|bde|bn|div|res|orp|fup|aa|roe|dtg|nlt|net)$/i.test(lower)) {
         return lower.toUpperCase();
       }
       return word.charAt(0).toUpperCase() + word.slice(1);
@@ -643,7 +884,6 @@ function inferTaskVerb(text: string): string {
 }
 
 function extractTimeFromText(text: string, kind: 'start' | 'end'): string {
-  // Matches "0700 hrs 11 Feb 2025" -> "110700", "1200 hrs on 12 Feb 25" -> "121200"
   const ddmmyyMatch = text.match(/([0-9]{4})\s*(?:hrs)?(?:\s*(?:on)?\s*([0-9]{1,2})\s*([A-Za-z]{3})\s*([0-9]{2,4})?)/i);
   if (ddmmyyMatch) {
     const time = ddmmyyMatch[1];
@@ -655,61 +895,76 @@ function extractTimeFromText(text: string, kind: 'start' | 'end'): string {
   return rawMatch ? rawMatch[1] : '';
 }
 
-function cleanTimeString(timeStr?: string): string {
-  if (!timeStr) return '';
-  const match = timeStr.match(/[0-9]{4,6}/);
-  return match ? match[0] : timeStr;
-}
-
 function createDefaultRows(phase: string): TaskSyncRow[] {
   return [
     {
       id: 'row-1',
-      asltUnit: '41 Infantry Brigade',
-      resUnit: 'Divisional Integral Armour',
-      fireUnit: 'Divisional Artillery Brigade',
-      task: 'Establish',
+      asltUnit: 'INF BN A',
+      relatedFrom: '11 Infantry Division',
+      formation: 'Two-front formation',
+      task: 'Capture',
+      objective: 'en COY A',
+      taskDesc: 'Capture en COY A',
       isCtgcy: false,
-      taskDesc: 'Establish bridgehead between Delhi and York',
-      execCode: '',
-      startType: 'H Hr',
-      startTime: '100600',
+      resUnit: '-',
+      relatedToPurpose: 'Support flank maneuver',
+      fireUnit: '-',
+      startLoc: 'FUP Alpha',
+      timingType: 'H Hr',
+      startTime: '110300',
       endType: 'By',
       endTime: '110700',
       east: '4908',
       north: '8403',
+      successSignal: 'Green star flare',
+      remarks: 'Maintain radio silence during induction',
+      execCode: '',
     },
     {
       id: 'row-2',
-      asltUnit: '52 Infantry Brigade',
-      resUnit: '223 Armoured Brigade',
-      fireUnit: 'Divisional Artillery Brigade',
+      asltUnit: 'INF BN B',
+      relatedFrom: '11 Infantry Division',
+      formation: 'Column formation',
       task: 'Capture',
+      objective: 'en COY B',
+      taskDesc: 'Capture en COY B',
       isCtgcy: false,
-      taskDesc: 'Capture enemy FZDL at Kigali and canal defences at Paris',
-      execCode: '',
-      startType: 'ST',
-      startTime: '100600',
+      resUnit: '-',
+      relatedToPurpose: 'Facilitate breakout to Mahe Plains',
+      fireUnit: '-',
+      startLoc: 'Assembly Area RED',
+      timingType: 'ST',
+      startTime: '110300',
       endType: 'ET',
       endTime: '110700',
       east: '4908',
       north: '8403',
+      successSignal: 'Codeword VICTOR',
+      remarks: 'Engage with priority on canal sluice gates',
+      execCode: '',
     },
     {
       id: 'row-3',
-      asltUnit: '63 Infantry Brigade',
-      resUnit: '24 Mechanised Battalion',
-      fireUnit: 'Divisional Artillery Brigade',
-      task: 'Isolate',
+      asltUnit: 'INF BN C',
+      relatedFrom: '11 Infantry Division',
+      formation: 'Line formation',
+      task: '-',
+      objective: '',
+      taskDesc: '',
       isCtgcy: false,
-      taskDesc: 'Isolate London and Ulm',
-      execCode: '',
-      startType: 'ST',
-      startTime: '110700',
+      resUnit: '-',
+      relatedToPurpose: '',
+      fireUnit: '-',
+      startLoc: 'ORP Charlie',
+      timingType: 'ST',
+      startTime: '-',
       endType: 'ET',
-      endTime: '121200',
-      east: '4908',
-      north: '8403',
+      endTime: '-',
+      east: '-',
+      north: '-',
+      successSignal: 'Red star flare x 2',
+      remarks: 'On orders of Force Commander',
+      execCode: '',
     },
   ];
 }

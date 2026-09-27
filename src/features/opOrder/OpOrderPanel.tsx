@@ -40,8 +40,23 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
   const opOrder = state.data.startPreparation;
   const [transcribingField, setTranscribingField] = useState<keyof OpOrderData | null>(null);
   const [boxError, setBoxError] = useState<{ field: keyof OpOrderData; message: string } | null>(null);
+  const [sectionErrors, setSectionErrors] = useState<Partial<Record<keyof OpOrderData, string>>>({});
+
+  const REQUIRED_HEADS: Array<{ key: keyof OpOrderData; label: string }> = [
+    { key: 'enemy', label: 'Enemy situation' },
+    { key: 'own', label: 'Own forces' },
+    { key: 'mission', label: 'Mission' },
+    { key: 'execution', label: 'Execution' },
+  ];
 
   const handleChange = (field: keyof OpOrderData, value: string) => {
+    if (sectionErrors[field] && value.trim()) {
+      setSectionErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
     dispatch({
       type: 'UPDATE_STEP_DATA',
       payload: { step: 'startPreparation', data: { [field]: value } },
@@ -63,6 +78,13 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
     try {
       const result = await transcribeAudio(file);
       const text = result.text.trim();
+      if (text) {
+        setSectionErrors((prev) => {
+          const next = { ...prev };
+          delete next[targetField];
+          return next;
+        });
+      }
       dispatch({
         type: 'UPDATE_STEP_DATA',
         payload: { step: 'startPreparation', data: { [targetField]: text } },
@@ -88,6 +110,26 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
     }
   };
 
+  const handleGenerateClick = () => {
+    const errors: Partial<Record<keyof OpOrderData, string>> = {};
+
+    for (const head of REQUIRED_HEADS) {
+      if (!opOrder[head.key]?.trim()) {
+        errors[head.key] = `Information for ${head.label} is required.`;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setSectionErrors(errors);
+      return;
+    }
+
+    setSectionErrors({});
+    if (onGenerateGraphics) {
+      onGenerateGraphics();
+    }
+  };
+
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
@@ -102,6 +144,7 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
           const isDictateable = field.isDictateable;
           const isTranscribing = transcribingField === field.key;
           const showDividerBefore = field.key === 'enemy';
+          const fieldErrorMsg = sectionErrors[field.key];
 
           return (
             <React.Fragment key={field.key}>
@@ -127,7 +170,7 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
                     {field.type === 'textarea' ? (
                       <textarea
                         id={`opord-${field.key}`}
-                        className={`${styles.textarea} ${isSelected ? styles.dictationActive : ''}`}
+                        className={`${styles.textarea} ${isSelected ? styles.dictationActive : ''} ${fieldErrorMsg ? styles.inputError : ''}`}
                         style={field.height ? { height: field.height, minHeight: field.height } : undefined}
                         value={opOrder[field.key] || ''}
                         onChange={(e) => handleChange(field.key, e.target.value)}
@@ -139,7 +182,7 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
                       <input
                         id={`opord-${field.key}`}
                         type="text"
-                        className={`${styles.input} ${isSelected ? styles.dictationActive : ''}`}
+                        className={`${styles.input} ${isSelected ? styles.dictationActive : ''} ${fieldErrorMsg ? styles.inputError : ''}`}
                         value={opOrder[field.key] || ''}
                         onChange={(e) => handleChange(field.key, e.target.value)}
                         onFocus={() => handleFieldSelect(field.key)}
@@ -156,6 +199,10 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
                     )}
                   </div>
 
+                  {fieldErrorMsg && (
+                    <span className={styles.fieldError}>{fieldErrorMsg}</span>
+                  )}
+
                   {boxError && boxError.field === field.key && (
                     <span className={styles.fieldError}>{boxError.message}</span>
                   )}
@@ -171,7 +218,7 @@ export function OpOrderPanel({ onOpenEditor, onGenerateGraphics, isGenerating = 
         <button 
           type="button" 
           className={styles.bottomBtn} 
-          onClick={onGenerateGraphics}
+          onClick={handleGenerateClick}
           disabled={isGenerating}
           style={isGenerating ? { opacity: 0.7, cursor: 'wait' } : undefined}
         >

@@ -15,36 +15,41 @@ export interface OpOrderParseApiResponse {
 export function buildOpOrderFullText(data: Partial<OpOrderData>): string {
   const parts: string[] = [];
 
-  if (data.reportNumber) parts.push(`REPORT NUMBER: ${data.reportNumber}`);
-  if (data.classification) parts.push(`CLASSIFICATION: ${data.classification}`);
-  if (data.dtg) parts.push(`DTG: ${data.dtg}`);
-  if (data.references) parts.push(`REFERENCES: ${data.references}`);
-  if (data.from) parts.push(`FROM: ${data.from}`);
-  if (data.to) parts.push(`TO: ${data.to}`);
+  const headers: string[] = [];
+  if (data.reportNumber) headers.push(`REPORT NUMBER: ${data.reportNumber}`);
+  if (data.classification) headers.push(`CLASSIFICATION: ${data.classification}`);
+  if (data.dtg) headers.push(`DTG: ${data.dtg}`);
+  if (data.references) headers.push(`REFERENCES: ${data.references}`);
+  if (data.from) headers.push(`FROM: ${data.from}`);
+  if (data.to) headers.push(`TO: ${data.to}`);
+  if (headers.length > 0) {
+    parts.push(headers.join('\n'));
+  }
 
   if (data.enemy || data.own) {
-    parts.push(`\nSITUATION`);
-    if (data.enemy) parts.push(`Enemy\n${data.enemy}`);
-    if (data.own) parts.push(`Own\n${data.own}`);
+    let sit = '1. SITUATION\n';
+    if (data.enemy) sit += `Enemy:\n${data.enemy.trim()}\n`;
+    if (data.own) sit += `Own:\n${data.own.trim()}\n`;
+    parts.push(sit.trim());
   }
 
   if (data.mission) {
-    parts.push(`\nMISSION\n${data.mission}`);
+    parts.push(`2. MISSION\n${data.mission.trim()}`);
   }
 
   if (data.execution) {
-    parts.push(`\nEXECUTION\n${data.execution}`);
+    parts.push(`3. EXECUTION\n${data.execution.trim()}`);
   }
 
   if (data.adminLogistics) {
-    parts.push(`\nADMINISTRATION & LOGISTICS\n${data.adminLogistics}`);
+    parts.push(`4. ADMINISTRATION & LOGISTICS\n${data.adminLogistics.trim()}`);
   }
 
   if (data.commandSignal) {
-    parts.push(`\nCOMMAND & SIGNAL\n${data.commandSignal}`);
+    parts.push(`5. COMMAND & SIGNAL\n${data.commandSignal.trim()}`);
   }
 
-  return parts.join('\n');
+  return parts.join('\n\n');
 }
 
 /**

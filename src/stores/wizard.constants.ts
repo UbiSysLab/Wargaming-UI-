@@ -6,7 +6,7 @@ export const STEP_ORDER: StepDefinition[] = [
   { id: 'warningOrder', order: 2, label: 'Warning Order / Special Idea' },
   { id: 'mapBrief', order: 3, label: 'Map Brief' },
   { id: 'resourceOrbat', order: 4, label: 'Resource & ORBAT' },
-  { id: 'startPreparation', order: 5, label: 'Start Preperation' },
+  { id: 'startPreparation', order: 5, label: 'Start Preparation' },
 ];
 
 export const initialWizardData: WizardData = {

@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rolldown/binding-linux-x64-gnu": "^1.1.5",
     "jszip": "^3.10.2",
     "pdfjs-dist": "^6.3.289",
     "react": "^19.2.7",

@@ -1,12 +1,11 @@
-/* TaskSyncTable.module.css */
+/* TaskSyncTable.module.css - Compact, Low Font-Size & Precise Parity with Reference */
 
 .windowCard {
   width: 100%;
-  max-width: 960px;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #cbd5e1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -15,41 +14,41 @@
   box-sizing: border-box;
 }
 
-/* Window Header / Tabs */
+/* 1. Window Header / Tabs */
 .windowHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  background: #e2e8f0;
-  padding: 6px 10px 0 10px;
+  background: #f1f5f9;
+  padding: 3px 10px 0 10px;
   border-bottom: 1px solid #cbd5e1;
   user-select: none;
 }
 
 .tabsContainer {
   display: flex;
-  gap: 4px;
+  gap: 3px;
 }
 
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: #475569;
-  background: #f1f5f9;
+  color: #64748b;
+  background: #e2e8f0;
   border: 1px solid #cbd5e1;
   border-bottom: none;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .tab:hover {
-  background: #ffffff;
+  background: #f8fafc;
   color: #0f172a;
 }
 
@@ -57,12 +56,12 @@
   background: #ffffff;
   color: #0f172a;
   font-weight: 600;
-  border-color: #cbd5e1;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid #ffffff;
+  margin-bottom: -1px;
 }
 
 .tabClose {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   opacity: 0.6;
   cursor: pointer;
 }
@@ -75,10 +74,10 @@
 .windowControls {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 8px;
-  padding-right: 4px;
-  font-size: 0.85rem;
+  gap: 8px;
+  padding-bottom: 4px;
+  padding-right: 2px;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
@@ -87,8 +86,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   border-radius: 3px;
   transition: background 0.15s;
 }
@@ -98,12 +97,12 @@
   color: #0f172a;
 }
 
-/* Body Content */
+/* 2. Body Content - Compact padding & gap */
 .bodyContent {
-  padding: 1rem 1.25rem;
+  padding: 8px 12px 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 8px;
   background: #ffffff;
 }
 
@@ -112,55 +111,53 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 10px;
 }
 
 .planSection {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  min-width: 140px;
+  gap: 2px;
+  min-width: 80px;
 }
 
 .tasksTitle {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #0266cc;
   letter-spacing: -0.01em;
+  line-height: 1.1;
 }
 
 .planSelectorGroup {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 2px;
 }
 
 .planSelect {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #0266cc;
-  border: 1px solid #bfdbfe;
-  background: #f8fafc;
-  border-radius: 4px;
-  padding: 2px 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 3px;
+  padding: 1px 6px;
+  height: 22px;
   outline: none;
   cursor: pointer;
+  width: fit-content;
 }
 
-.ctgcyLabel, .rowCtgcyLabel {
-  display: flex;
+.ctgcyLabel {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.7rem;
   color: #475569;
   cursor: pointer;
-}
-
-.ctgcyLabel input, .rowCtgcyLabel input {
-  cursor: pointer;
-  accent-color: #0266cc;
 }
 
 /* Objectives Section */
@@ -168,456 +165,794 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 4px;
+  max-width: 440px;
 }
 
 .objectiveRow {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 6px;
 }
 
 .objLabel {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #334155;
-  width: 42px;
+  width: 32px;
+  flex-shrink: 0;
 }
 
 .objInput {
   flex: 1;
-  padding: 4px 8px;
-  font-size: 0.82rem;
+  height: 23px;
   border: 1px solid #cbd5e1;
-  border-radius: 4px;
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-style: italic;
+  outline: none;
   background: #ffffff;
   color: #1e293b;
-  outline: none;
+  box-sizing: border-box;
   transition: border-color 0.15s;
 }
 
 .objInput:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  border-color: #0266cc;
 }
 
 .objDeleteBtn {
-  background: transparent;
+  background: none;
   border: none;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 1px 3px;
+  border-radius: 2px;
 }
 
 .objDeleteBtn:hover {
   color: #ef4444;
 }
 
+.objectiveActionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1px;
+}
+
 .addObjBtn {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: transparent;
+  background: none;
   border: none;
   color: #0266cc;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 2px 0;
-}
-
-.addObjBtn span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #0266cc;
-  color: #ffffff;
-  font-size: 0.75rem;
-  line-height: 1;
+  padding: 1px 3px;
+  border-radius: 3px;
+  transition: opacity 0.15s;
 }
 
 .addObjBtn:hover {
-  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.actionIconCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #0266cc;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.micActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #0266cc;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 1px 3px;
+  border-radius: 3px;
+  transition: opacity 0.15s;
+}
+
+.micActionBtn:hover {
+  opacity: 0.8;
+}
+
+.micRecordingBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #dc2626;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  cursor: pointer;
+  animation: pulseBorder 1.5s infinite;
+}
+
+@keyframes pulseBorder {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.recordingPulseDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: blink 1s infinite alternate;
+}
+
+@keyframes blink {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.feedbackText {
+  font-size: 0.7rem;
+  color: #0266cc;
+  font-weight: 500;
 }
 
 /* Timing Section */
 .timingSection {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  min-width: 140px;
+  gap: 4px;
+  min-width: 110px;
 }
 
 .timingRow {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: flex-end;
+  gap: 5px;
 }
 
 .timeLabel {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 500;
   color: #475569;
-  width: 40px;
+  width: 32px;
+  text-align: right;
 }
 
 .timeInput {
-  width: 90px;
-  padding: 4px 6px;
-  font-size: 0.82rem;
+  width: 68px;
+  height: 22px;
   border: 1px solid #cbd5e1;
-  border-radius: 4px;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.72rem;
   text-align: center;
   outline: none;
+  background: #ffffff;
+  color: #1e293b;
+  box-sizing: border-box;
 }
 
-/* Phase Header Bar */
-.phaseBar {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  background: #f8fafc;
+/* 3. Phase Section - 2-Row Compact Grid */
+.phaseSection {
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  flex-wrap: wrap;
+  border-radius: 5px;
+  padding: 6px 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.phaseSelector {
+.phaseGrid {
+  display: grid;
+  grid-template-columns: 95px 125px 170px 36px auto;
+  grid-gap: 4px 8px;
+  align-items: center;
+}
+
+.phaseCol1 {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+}
+
+.phaseDropdownWrapper {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  width: fit-content;
 }
 
 .phaseDropdown {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #0266cc;
   border: none;
   background: transparent;
-  cursor: pointer;
   outline: none;
+  cursor: pointer;
+  padding-right: 14px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .phaseNameInput {
-  font-size: 0.78rem;
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
   padding: 2px 6px;
-  width: 100px;
+  font-size: 0.72rem;
   outline: none;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
-.phaseTaskFields {
+.phaseCol2 {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+}
+
+.taskVerbSelectWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
 }
 
 .phaseTaskSelect {
-  font-size: 0.82rem;
-  font-weight: 500;
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  padding: 2px 6px;
-  outline: none;
+  padding: 1px 16px 1px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1e293b;
   background: #ffffff;
+  outline: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
 }
 
 .phaseTaskDescInput {
-  font-size: 0.78rem;
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
   padding: 2px 6px;
-  width: 130px;
+  font-size: 0.72rem;
   outline: none;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
-.phaseCoords {
+.phaseCol3 {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
-.coordRow {
+.coordLine {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .coordLabel {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #475569;
+  width: 28px;
+}
+
+.coordInputTime {
+  width: 56px;
+  height: 22px;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.7rem;
+  text-align: center;
+  outline: none;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.coordLabelSmall {
+  font-size: 0.7rem;
   font-weight: 600;
-  color: #64748b;
+  color: #475569;
+  width: 14px;
+  text-align: right;
 }
 
-.coordInput {
-  width: 65px;
-  padding: 2px 4px;
-  font-size: 0.75rem;
+.coordInputGrid {
+  width: 44px;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.7rem;
+  text-align: center;
   outline: none;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
-.coordInputSmall {
-  width: 48px;
-  padding: 2px 4px;
-  font-size: 0.75rem;
+.phaseCol4 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+}
+
+.colorSwatchBox {
+  display: flex;
+  align-items: center;
+  gap: 3px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 2px 4px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 22px;
+  box-sizing: border-box;
 }
 
 .colorSwatch {
-  width: 28px;
-  height: 24px;
-  border-radius: 4px;
-  border: 1px solid #cbd5e1;
-  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.swatchChevron {
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.phaseCol5 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  height: 100%;
 }
 
 .newPhaseBtn {
-  margin-left: auto;
-  background: #0052cc;
+  background: #0266cc;
   color: #ffffff;
   border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.82rem;
+  border-radius: 3px;
+  padding: 3px 8px;
+  height: 22px;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.15s;
+  display: flex;
+  align-items: center;
 }
 
 .newPhaseBtn:hover {
-  background: #0747a6;
+  background: #0252a4;
 }
 
-/* Table */
+.selectChevron {
+  position: absolute;
+  right: 5px;
+  pointer-events: none;
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.phaseStepperLine {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  margin-left: 2px;
+}
+
+.stepperDash {
+  width: 22px;
+  height: 2.5px;
+  background: #cbd5e1;
+  border-radius: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.stepperDashActive {
+  background: #0266cc;
+  height: 2.5px;
+}
+
+/* 4. Units / Tasks Table - Compact & Neat */
 .tableWrapper {
   overflow-x: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background: #ffffff;
+  margin-top: 2px;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
 }
 
-.table thead {
-  background: #f8fafc;
+.tableHeaderRow {
+  background: #ffffff;
+  border-top: 1px solid #cbd5e1;
   border-bottom: 1px solid #cbd5e1;
 }
 
-.table th {
-  padding: 8px 10px;
-  text-align: left;
+.tableHeaderRow th {
+  padding: 5px 3px;
   font-weight: 600;
   color: #475569;
-  font-size: 0.78rem;
+  text-align: left;
+  border: none;
+  font-size: 0.72rem;
 }
 
 .tableToggleIcons {
   display: flex;
-  gap: 6px;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 1px 4px;
+  width: fit-content;
+  margin: 0 auto;
+  height: 20px;
+  box-sizing: border-box;
 }
 
 .iconTableActive {
   color: #0266cc;
   cursor: pointer;
+  font-size: 0.75rem;
+  border-bottom: 2px solid #0266cc;
 }
 
 .iconChart {
-  opacity: 0.6;
+  color: #64748b;
   cursor: pointer;
+  font-size: 0.75rem;
 }
 
 .tableRow {
-  border-bottom: 1px dashed #e2e8f0;
-  vertical-align: top;
+  border-bottom: 1px dashed #cbd5e1;
 }
 
 .tableRow:last-child {
   border-bottom: none;
 }
 
-.table td {
-  padding: 8px 10px;
+.tableRow td {
+  padding: 5px 3px;
+  vertical-align: top;
+  border: none;
 }
 
+/* Compact Columns */
+.colAsltUnit {
+  width: 14%;
+  min-width: 85px;
+}
+
+.colResUnit {
+  width: 14%;
+  min-width: 85px;
+}
+
+.colFireUnit {
+  width: 13%;
+  min-width: 75px;
+}
+
+.colTasks {
+  width: 28%;
+  min-width: 155px;
+}
+
+.colTime {
+  width: 17%;
+  min-width: 105px;
+}
+
+.colLoc {
+  width: 10%;
+  min-width: 65px;
+}
+
+.colActions {
+  width: 4%;
+  min-width: 26px;
+}
+
+/* Compact Input Fields */
 .cellInput {
   width: 100%;
-  padding: 4px 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  height: 24px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 2px 5px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #1e293b;
   background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.cellInput:focus {
+  border-color: #0266cc;
+}
+
+.cellSelectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .cellSelect {
   width: 100%;
-  padding: 4px 6px;
-  font-size: 0.78rem;
+  height: 24px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 2px 14px 2px 5px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #1e293b;
   background: #ffffff;
+  outline: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
 }
 
-/* Tasks cell stacked layout */
+/* Tasks Cell Stack */
 .taskCellStack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
-.taskTopLine {
+.taskLine1 {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
 }
 
 .taskVerbSelect {
-  flex: 1;
-  padding: 3px 6px;
-  font-size: 0.78rem;
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 1px 14px 1px 5px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #1e293b;
   background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
 }
 
-.cellInputDesc {
+.ctgcyCheckboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  color: #475569;
+  cursor: pointer;
+}
+
+.taskDescInput {
   width: 100%;
-  padding: 3px 6px;
-  font-size: 0.76rem;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 2px 5px;
+  font-size: 0.72rem;
+  color: #1e293b;
   background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
 }
 
-.cellInputExec {
+.taskDescInput:focus {
+  border-color: #0266cc;
+}
+
+.execCodeInput {
   width: 100%;
-  padding: 3px 6px;
-  font-size: 0.74rem;
-  font-style: italic;
-  color: #64748b;
+  height: 20px;
   border: 1px solid #e2e8f0;
   border-radius: 3px;
-  outline: none;
+  padding: 1px 5px;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #94a3b8;
   background: #fafafa;
+  outline: none;
+  box-sizing: border-box;
 }
 
-/* Time cell stacked layout */
+/* Time Cell Stack */
 .timeCellStack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .timeRow {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
-.timeKindSelect {
-  width: 54px;
-  padding: 3px 4px;
-  font-size: 0.75rem;
+.timeSelectWrapper {
+  position: relative;
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.timeTypeSelect {
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 1px 12px 1px 3px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #475569;
   background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.timeStaticLabel {
+  width: 18px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .timeValInput {
-  width: 65px;
-  padding: 3px 4px;
-  font-size: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
-  outline: none;
+  padding: 1px 4px;
+  font-size: 0.7rem;
   text-align: center;
+  color: #1e293b;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
 }
 
-/* Loc cell stacked layout */
+/* Location Cell Stack */
 .locCellStack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .locRow {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .locLabel {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: #64748b;
-  width: 16px;
+  color: #475569;
+  width: 12px;
+  text-align: right;
 }
 
 .locInput {
-  width: 56px;
-  padding: 3px 4px;
-  font-size: 0.75rem;
+  width: 100%;
+  height: 22px;
   border: 1px solid #cbd5e1;
   border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.7rem;
+  text-align: center;
+  color: #1e293b;
+  background: #ffffff;
   outline: none;
+  box-sizing: border-box;
 }
 
-/* Row Action Buttons */
-.rowActions {
+/* Row Actions */
+.rowActionsStack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  align-items: center;
-}
-
-.deleteRowBtn, .addRowBtn {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1.5px solid #0266cc;
-  background: #ffffff;
-  color: #0266cc;
-  font-size: 0.8rem;
-  font-weight: 700;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
+  padding-top: 1px;
+}
+
+.circleDeleteBtn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.2px solid #0284c7;
+  background: #ffffff;
+  color: #0284c7;
+  font-size: 0.68rem;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s;
-  padding: 0;
-  line-height: 1;
 }
 
-.deleteRowBtn:hover {
-  background: #fee2e2;
-  border-color: #ef4444;
-  color: #ef4444;
+.circleDeleteBtn:hover {
+  background: #f0f9ff;
+  border-color: #0369a1;
+  color: #0369a1;
 }
 
-.addRowBtn:hover {
+.circleAddBtn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
   background: #0266cc;
   color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.circleAddBtn:hover {
+  background: #0252a4;
 }
